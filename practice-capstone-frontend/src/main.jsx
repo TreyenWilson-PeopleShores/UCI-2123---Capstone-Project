@@ -4,9 +4,11 @@ import React from "react";
 import ReactDom from "react-dom/client";
 import './index.css';
 import App from './App.jsx';
+import Cal from "./components/Cal.jsx"
 
 createRoot(document.getElementById('root')).render(
-  <body>
-    <App />
-  </body>,
+  <div>
+    <App/>
+    <Cal/>
+  </div>,
 )
