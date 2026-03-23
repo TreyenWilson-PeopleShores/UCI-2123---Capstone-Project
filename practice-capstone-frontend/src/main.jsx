@@ -10,5 +10,7 @@ createRoot(document.getElementById('root')).render(
   <div>
     <App/>
     <Cal/>
+    <Cal/>
+    <App/>
   </div>,
 )
