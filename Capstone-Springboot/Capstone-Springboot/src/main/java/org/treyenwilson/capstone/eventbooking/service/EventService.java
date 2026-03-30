@@ -17,4 +17,8 @@ public class EventService {
     public List<Event> getAllEvents(){
         return  repository.findAll();
     }
+
+    public Event getByEventId(Long id) {
+        return repository.findById(id).orElse(null);
+    }
 }
