@@ -1,6 +1,7 @@
 package org.treyenwilson.capstone.eventbooking.entity;
 import jakarta.persistence.*;
-
+import org.hibernate.annotations.NotFound;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 import javax.annotation.processing.Generated;
@@ -11,6 +12,7 @@ public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotBlank
     private String name;
     private String description;
     private LocalDateTime event_date;

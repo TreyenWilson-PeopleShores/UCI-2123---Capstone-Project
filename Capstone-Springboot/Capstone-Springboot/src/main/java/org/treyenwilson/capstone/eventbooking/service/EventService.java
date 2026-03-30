@@ -1,6 +1,8 @@
 package org.treyenwilson.capstone.eventbooking.service;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import org.treyenwilson.capstone.eventbooking.entity.Event;
 import org.treyenwilson.capstone.eventbooking.repository.EventRepository;
 
@@ -19,6 +21,7 @@ public class EventService {
     }
 
     public Event getByEventId(Long id) {
-        return repository.findById(id).orElse(null);
+        return repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Test"));
     }
 }
