@@ -1,0 +1,7 @@
+AI Tool Usage Documentation
+M365 Copilot was used to help refine this documentatiom.
+
+M365 Copilot was used during the initial setup of the Spring Boot backend to assist with project configuration in IntelliJ, including generating a basic application structure and validating that Spring Boot was running correctly. A simple HealthController was created to confirm successful startup and routing.
+M365 Copilot was also used to assist with configuring application.properties and identifying the correct dependencies to include in pom.xml. These suggestions were reviewed, adjusted, and integrated manually to match project requirements.
+ChatGPT was used as a learning aid while setting up the base React frontend and while troubleshooting backend issues such as JPA entity mappings, REST endpoint behavior, and date/time handling with MySQL. The final implementations were written and refined by me after understanding the underlying concepts.
+AI tools were used to support learning, validation, and problem-solving, not to replace implementation or decision-making.
