@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 public class EventResponse {
     private Long id;
     private LocalDateTime date;
+    private String status;
 //    private String name;
 //    private String description;
 //
@@ -21,6 +22,8 @@ public class EventResponse {
     public LocalDateTime getDate() { return date; }
     public void setDate(LocalDateTime date) { this.date = date; }
 
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
     /*
 
 

@@ -1,0 +1,63 @@
+
+
+CREATE DATABASE Capstone_IMPROVED;
+use Capstone_IMPROVED;
+CREATE TABLE events (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    event_name VARCHAR(255) NOT NULL,
+    date DATE NOT NULL,
+    status ENUM('SCHEDULED','CANCELLED','COMPLETED') NOT NULL,
+    total_spots INT NOT NULL,
+    venue_id INT NOT NULL
+);
+
+ALTER TABLE events
+ADD UNIQUE events_venue_date_unique (venue_id, date);
+
+CREATE TABLE venues (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    venue_name VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    total_capacity BIGINT NOT NULL
+);
+
+CREATE TABLE tickets (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    event_id INT NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    total_quantity INT NOT NULL,
+    sold INT NOT NULL
+);
+
+ALTER TABLE tickets
+ADD UNIQUE tickets_event_id_unique (event_id);
+
+CREATE TABLE users (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('ADMIN', 'USER')
+);
+
+CREATE TABLE tickets_sold (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    ticket_id INT NOT NULL,
+    date_sold DATE NOT NULL
+);
+
+ALTER TABLE events
+ADD CONSTRAINT events_venue_id_foreign
+FOREIGN KEY (venue_id) REFERENCES venues (id);
+
+ALTER TABLE tickets
+ADD CONSTRAINT tickets_event_id_foreign
+FOREIGN KEY (event_id) REFERENCES events (id);
+
+ALTER TABLE tickets_sold
+ADD CONSTRAINT tickets_sold_user_id_foreign
+FOREIGN KEY (user_id) REFERENCES users (id);
+
+ALTER TABLE tickets_sold
+ADD CONSTRAINT tickets_sold_ticket_id_foreign
+FOREIGN KEY (ticket_id) REFERENCES tickets (id);

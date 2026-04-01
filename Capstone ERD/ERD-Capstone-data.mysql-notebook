@@ -1,0 +1,223 @@
+{
+    "type": "MySQLNotebook",
+    "version": "1.0",
+    "caption": "Untitled-2",
+    "content": "use capstone_improved;\n\n-- ===========================\n-- BASE DATA: VENUES + USERS\n-- ===========================\n\nINSERT INTO venues (venue_name, location, total_capacity) VALUES\n('Columbus Convention Center', 'Columbus, OH', 20000),\n('Nationwide Arena', 'Columbus, OH', 18000),\n('House of Blues', 'Cleveland, OH', 2500),\n('Riverfront Pavilion', 'Cincinnati, OH', 12000),\n('Grant Park', 'Chicago, IL', 50000),\n('United Center', 'Chicago, IL', 23000),\n('Madison Square Garden', 'New York, NY', 21000),\n('Barclays Center', 'Brooklyn, NY', 19000),\n('TD Garden', 'Boston, MA', 19500),\n('Wells Fargo Center', 'Philadelphia, PA', 21000),\n('Crypto.com Arena', 'Los Angeles, CA', 20000),\n('Hollywood Bowl', 'Los Angeles, CA', 17500),\n('Red Rocks Amphitheatre', 'Morrison, CO', 9525),\n('Ball Arena', 'Denver, CO', 19500),\n('AT&T Stadium', 'Arlington, TX', 80000),\n('NRG Stadium', 'Houston, TX', 72000),\n('Kaseya Center', 'Miami, FL', 19000),\n('Amalie Arena', 'Tampa, FL', 20000),\n('Wembley Stadium', 'London, UK', 90000),\n('O2 Arena', 'London, UK', 20000);\n\nINSERT INTO users (username, password, role) VALUES\n('admin', 'adminpass', 'ADMIN'),\n('treyen', 'password123', 'USER'),\n('alex', 'password123', 'USER'),\n('jordan', 'password123', 'USER'),\n('sam', 'password123', 'USER'),\n('casey', 'password123', 'USER'),\n('taylor', 'password123', 'USER'),\n('morgan', 'password123', 'USER');\n\n-- =========================================================\n-- PROCEDURE: GENERATE ~800 EVENTS (2007–2030)\n-- - Each venue gets ~40 event-days spread across the timeline\n-- - Some events become multi-day by inserting consecutive days\n-- - CANCELLED sprinkled in\n-- =========================================================\n\nDELIMITER $$\n\nDROP PROCEDURE IF EXISTS seed_events $$\nCREATE PROCEDURE seed_events()\nBEGIN\n    DECLARE v_id INT;\n    DECLARE v_count INT;\n    DECLARE i INT;\n    DECLARE day_attempts INT;\n\n    DECLARE chosen_date DATE;\n    DECLARE chosen_status VARCHAR(10);\n    DECLARE spots INT;\n    DECLARE base_name VARCHAR(255);\n\n    -- number of venues\n    SELECT COUNT(*) INTO v_count FROM venues;\n\n    SET v_id = 1;\n    WHILE v_id <= v_count DO\n\n        -- create ~40 events per venue (~20 venues => ~800 events)\n        SET i = 1;\n        WHILE i <= 40 DO\n\n            -- Pick a random date between 2007-01-01 and 2030-12-31\n            -- and ensure (venue_id, date) is unique by retrying.\n            SET day_attempts = 0;\n\n            pick_date: LOOP\n                SET chosen_date = DATE_ADD('2007-01-01', INTERVAL FLOOR(RAND() * (DATEDIFF('2030-12-31','2007-01-01') + 1)) DAY);\n                SET day_attempts = day_attempts + 1;\n\n                IF NOT EXISTS (\n                    SELECT 1 FROM events e WHERE e.venue_id = v_id AND e.date = chosen_date\n                ) THEN\n                    LEAVE pick_date;\n                END IF;\n\n                -- Safety break in case something goes odd\n                IF day_attempts > 50 THEN\n                    -- fallback: shove it forward by attempts count\n                    SET chosen_date = DATE_ADD('2007-01-01', INTERVAL (v_id * 50 + i) DAY);\n                    LEAVE pick_date;\n                END IF;\n            END LOOP;\n\n            -- Decide status based on date (past mostly COMPLETED, future mostly SCHEDULED)\n            IF chosen_date < CURDATE() THEN\n                -- Past: mostly COMPLETED, some CANCELLED\n                IF RAND() < 0.10 THEN\n                    SET chosen_status = 'CANCELLED';\n                ELSE\n                    SET chosen_status = 'COMPLETED';\n                END IF;\n            ELSE\n                -- Future: mostly SCHEDULED, some CANCELLED\n                IF RAND() < 0.07 THEN\n                    SET chosen_status = 'CANCELLED';\n                ELSE\n                    SET chosen_status = 'SCHEDULED';\n                END IF;\n            END IF;\n\n            -- Spots: based on venue capacity (keep it reasonable)\n            SELECT LEAST(GREATEST(FLOOR(total_capacity * (0.6 + RAND()*0.35)), 200), 100000)\n            INTO spots\n            FROM venues\n            WHERE id = v_id;\n\n            -- Event base name pattern\n            SET base_name = CONCAT(\n                CASE FLOOR(RAND()*6)\n                    WHEN 0 THEN 'Tech Summit'\n                    WHEN 1 THEN 'Music Night'\n                    WHEN 2 THEN 'Championship Series'\n                    WHEN 3 THEN 'Comedy Showcase'\n                    WHEN 4 THEN 'Startup Expo'\n                    ELSE 'Community Fest'\n                END,\n                ' ',\n                YEAR(chosen_date)\n            );\n\n            -- Insert the main event day\n            INSERT INTO events (event_name, date, status, total_spots, venue_id)\n            VALUES (base_name, chosen_date, chosen_status, spots, v_id);\n\n            -- Occasionally create a multi-day event by inserting 1–2 more consecutive days\n            IF RAND() < 0.22 THEN\n                -- Day 2\n                IF NOT EXISTS (SELECT 1 FROM events e WHERE e.venue_id = v_id AND e.date = DATE_ADD(chosen_date, INTERVAL 1 DAY)) THEN\n                    INSERT INTO events (event_name, date, status, total_spots, venue_id)\n                    VALUES (CONCAT(base_name, ' - Day 2'), DATE_ADD(chosen_date, INTERVAL 1 DAY), chosen_status, spots, v_id);\n                END IF;\n\n                -- Day 3 (less likely)\n                IF RAND() < 0.35 THEN\n                    IF NOT EXISTS (SELECT 1 FROM events e WHERE e.venue_id = v_id AND e.date = DATE_ADD(chosen_date, INTERVAL 2 DAY)) THEN\n                        INSERT INTO events (event_name, date, status, total_spots, venue_id)\n                        VALUES (CONCAT(base_name, ' - Day 3'), DATE_ADD(chosen_date, INTERVAL 2 DAY), chosen_status, spots, v_id);\n                    END IF;\n                END IF;\n            END IF;\n\n            SET i = i + 1;\n        END WHILE;\n\n        SET v_id = v_id + 1;\n    END WHILE;\n\nEND $$\n\nDELIMITER ;\n\n-- Run the seeder\nCALL seed_events();\n\n-- =========================================================\n-- TICKETS: one ticket row per event (enforces UNIQUE(event_id))\n-- price depends on venue size + slight randomness\n-- sold respects status:\n--   COMPLETED: 60–98% sold\n--   SCHEDULED: 0–40% sold\n--   CANCELLED: 0 sold (clean default)\n-- =========================================================\n\nINSERT INTO tickets (event_id, price, total_quantity, sold)\nSELECT\n    e.id AS event_id,\n    -- price: base on size\n    ROUND(\n        CASE\n            WHEN e.total_spots >= 70000 THEN 180 + (RAND()*40)\n            WHEN e.total_spots >= 20000 THEN 85 + (RAND()*35)\n            WHEN e.total_spots >= 8000  THEN 45 + (RAND()*25)\n            ELSE 20 + (RAND()*20)\n        END\n    , 2) AS price,\n    e.total_spots AS total_quantity,\n    CASE\n        WHEN e.status = 'CANCELLED' THEN 0\n        WHEN e.status = 'COMPLETED' THEN FLOOR(e.total_spots * (0.60 + RAND()*0.38))\n        ELSE FLOOR(e.total_spots * (RAND()*0.40))\n    END AS sold\nFROM events e;\n\n-- =========================================================\n-- TICKET SALES: create many tickets_sold rows\n-- We generate ~6000 sales records:\n-- - choose random user and random ticket\n-- - date_sold is before event date when possible\n-- - for CANCELLED tickets (sold=0) this will naturally avoid them by selection filter\n-- =========================================================\n\nDELIMITER $$\n\nDROP PROCEDURE IF EXISTS seed_ticket_sales $$\nCREATE PROCEDURE seed_ticket_sales()\nBEGIN\n    DECLARE n INT DEFAULT 1;\n    DECLARE max_users INT;\n    DECLARE chosen_user INT;\n    DECLARE chosen_ticket INT;\n    DECLARE ev_date DATE;\n    DECLARE sold_date DATE;\n\n    SELECT COUNT(*) INTO max_users FROM users;\n\n    WHILE n <= 6000 DO\n        -- choose a ticket that has sold > 0\n        SELECT t.id, e.date\n        INTO chosen_ticket, ev_date\n        FROM tickets t\n        JOIN events e ON e.id = t.event_id\n        WHERE t.sold > 0\n        ORDER BY RAND()\n        LIMIT 1;\n\n        SET chosen_user = 1 + FLOOR(RAND() * max_users);\n\n        -- pick a sold date from 1 to 120 days before event date (or same day)\n        SET sold_date = DATE_SUB(ev_date, INTERVAL FLOOR(RAND()*120) DAY);\n\n        -- Ensure sold_date isn't before 2007-01-01 (keep in dataset range)\n        IF sold_date < '2007-01-01' THEN\n            SET sold_date = '2007-01-01';\n        END IF;\n\n        INSERT INTO tickets_sold (user_id, ticket_id, date_sold)\n        VALUES (chosen_user, chosen_ticket, sold_date);\n\n        SET n = n + 1;\n    END WHILE;\nEND $$\n\nDELIMITER ;\n\nCALL seed_ticket_sales();\n\n-- =========================================================\n-- QUICK CHECKS (optional)\n-- =========================================================\n-- How many events?\n-- SELECT COUNT(*) AS total_events FROM events;\n\n-- Status distribution\n-- SELECT status, COUNT(*) AS cnt FROM events GROUP BY status;\n\n-- Verify no double-booking\n-- SELECT venue_id, date, COUNT(*) c FROM events GROUP BY venue_id, date HAVING c > 1;\n\n-- A few cancelled examples\n-- SELECT id, event_name, date, venue_id FROM events WHERE status='CANCELLED' ORDER BY date LIMIT 20;\n",
+    "options": {
+        "tabSize": 4,
+        "indentSize": 4,
+        "insertSpaces": true,
+        "defaultEOL": "LF",
+        "trimAutoWhitespace": true
+    },
+    "viewState": null,
+    "contexts": [
+        {
+            "state": {
+                "start": 1,
+                "end": 260,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 2,
+                            "index": 0,
+                            "resultId": "75a3a428-41c1-4944-e717-ea2b3a7dc39d",
+                            "content": "OK, 0 records retrieved in 1.378ms"
+                        },
+                        {
+                            "type": 2,
+                            "index": 1,
+                            "resultId": "d43bc638-0aa9-4ef6-dd28-0c875edc877d",
+                            "content": "OK, 20 rows affected in 10.341ms"
+                        },
+                        {
+                            "type": 2,
+                            "index": 2,
+                            "resultId": "9c60dce4-991f-4eee-e206-3c92b33fce00",
+                            "content": "OK, 8 rows affected in 7.188ms"
+                        },
+                        {
+                            "type": 2,
+                            "index": 4,
+                            "resultId": "2b0e3739-2e9a-49ae-ead5-919c74392738",
+                            "content": "OK, 0 records retrieved in 3.481ms"
+                        },
+                        {
+                            "type": 2,
+                            "index": 5,
+                            "resultId": "dd4f9eed-a051-4125-afb7-511dcbe55d21",
+                            "content": "OK, 0 records retrieved in 11.44ms"
+                        },
+                        {
+                            "type": 2,
+                            "index": 7,
+                            "resultId": "f8aeb7db-cccc-42eb-a35b-1f9c62550028",
+                            "content": "OK, 1 row affected in 4.09942364692688s",
+                            "subIndex": 0
+                        },
+                        {
+                            "type": 2,
+                            "index": 8,
+                            "resultId": "bd2dec26-fb7b-4e7f-d9ed-71fddbab872b",
+                            "content": "OK, 1041 rows affected in 152.287ms"
+                        },
+                        {
+                            "type": 2,
+                            "index": 10,
+                            "resultId": "d4b142f0-b70e-4e99-c070-62d43bfe027e",
+                            "content": "OK, 0 records retrieved in 2.503ms"
+                        },
+                        {
+                            "type": 2,
+                            "index": 11,
+                            "resultId": "b6711396-1159-437c-c37b-e31bb10bc05e",
+                            "content": "OK, 0 records retrieved in 7.803ms"
+                        }
+                    ]
+                },
+                "currentHeight": 300,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 22
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 22,
+                            "length": 1027
+                        },
+                        "contentStart": 116,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 1049,
+                            "length": 325
+                        },
+                        "contentStart": 1051,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": "$$",
+                        "span": {
+                            "start": 1374,
+                            "length": 339
+                        },
+                        "contentStart": 1701,
+                        "state": 4
+                    },
+                    {
+                        "delimiter": "$$",
+                        "span": {
+                            "start": 1713,
+                            "length": 41
+                        },
+                        "contentStart": 1716,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": "$$",
+                        "span": {
+                            "start": 1754,
+                            "length": 4160
+                        },
+                        "contentStart": 1755,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 5914,
+                            "length": 13
+                        },
+                        "contentStart": 5916,
+                        "state": 4
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 5927,
+                            "length": 39
+                        },
+                        "contentStart": 5947,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 5966,
+                            "length": 1006
+                        },
+                        "contentStart": 6326,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": "$$",
+                        "span": {
+                            "start": 6972,
+                            "length": 399
+                        },
+                        "contentStart": 7359,
+                        "state": 4
+                    },
+                    {
+                        "delimiter": "$$",
+                        "span": {
+                            "start": 7371,
+                            "length": 47
+                        },
+                        "contentStart": 7374,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": "$$",
+                        "span": {
+                            "start": 7418,
+                            "length": 1083
+                        },
+                        "contentStart": 7419,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 8501,
+                            "length": 13
+                        },
+                        "contentStart": 8503,
+                        "state": 4
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 8514,
+                            "length": 27
+                        },
+                        "contentStart": 8516,
+                        "state": 0
+                    },
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 8541,
+                            "length": 553
+                        },
+                        "contentStart": 8540,
+                        "state": 3
+                    }
+                ]
+            },
+            "data": []
+        }
+    ]
+}
