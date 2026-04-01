@@ -1,7 +1,9 @@
 AI Tool Usage Documentation
-M365 Copilot was used to help refine this documentatiom.
-
-M365 Copilot was used during the initial setup of the Spring Boot backend to assist with project configuration in IntelliJ, including generating a basic application structure and validating that Spring Boot was running correctly. A simple HealthController was created to confirm successful startup and routing.
-M365 Copilot was also used to assist with configuring application.properties and identifying the correct dependencies to include in pom.xml. These suggestions were reviewed, adjusted, and integrated manually to match project requirements.
-ChatGPT was used as a learning aid while setting up the base React frontend and while troubleshooting backend issues such as JPA entity mappings, REST endpoint behavior, and date/time handling with MySQL. The final implementations were written and refined by me after understanding the underlying concepts.
-AI tools were used to support learning, validation, and problem-solving, not to replace implementation or decision-making.
+M365 Copilot and ChatGPT were used as supportive learning and productivity tools throughout the development of this project. All final design decisions, implementations, and integrations were completed by me after reviewing and understanding the generated suggestions.
+M365 Copilot was used during the initial setup of the Spring Boot backend to assist with project configuration in IntelliJ IDEA, including generating a basic application structure and verifying that the Spring Boot application was running correctly. A simple HealthController was created to confirm successful startup and routing.
+M365 Copilot was also used to assist with configuring application.properties and identifying appropriate dependencies for inclusion in pom.xml. All suggested configurations were reviewed, modified where necessary, and manually integrated to align with the project’s requirements.
+ChatGPT was used primarily as a learning aid during the setup of the React frontend and while troubleshooting backend issues, including JPA entity mappings, REST endpoint behavior, and date/time handling with MySQL. These interactions were used to better understand concepts and resolve errors; all final implementations were written and refined by me.
+AI tools were also used to generate synthetic mock and dummy data for the MySQL database tables (venues, events, tickets, users, and ticket sales). This data was used exclusively for development and testing purposes, including pagination, filtering, analytics, and edge-case validation. The generated data was reviewed and adjusted as needed before being integrated into the project.
+The database schema was initially exported from DrawSQL and later refactored to follow SQL and Java naming conventions (snake_case, lowercase) to ensure compatibility with MySQL and Spring Boot JPA. This refactor did not change any functional behavior.
+Overall, AI tools were used to support learning, validation, and efficiency, not to replace independent implementation or decision-making.
+M365 Copilot was given the original documentation, to polish it.
