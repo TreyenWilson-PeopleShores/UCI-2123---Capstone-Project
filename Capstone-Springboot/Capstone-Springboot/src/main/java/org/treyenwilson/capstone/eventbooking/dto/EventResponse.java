@@ -5,10 +5,10 @@ import java.time.LocalDateTime;
 
 public class EventResponse {
     private Long id;
-    
+    private LocalDateTime date;
 //    private String name;
 //    private String description;
-//    private LocalDateTime event_date;
+//
 //    private String venue;
 //    private Long total_capacity;
 //    private Long tickets_sold;
@@ -18,10 +18,12 @@ public class EventResponse {
     public EventResponse(){}
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+    public LocalDateTime getDate() { return date; }
+    public void setDate(LocalDateTime date) { this.date = date; }
+
     /*
 
-    public LocalDateTime getEvent_date() { return event_date; }
-    public void setEvent_date(LocalDateTime event_date) { this.event_date = event_date; }
+
     public Long getTotal_capacity() { return total_capacity; }
     public void setTotal_capacity(Long total_capacity) { this.total_capacity = total_capacity; }
     public Long getTickets_sold() { return tickets_sold; }
