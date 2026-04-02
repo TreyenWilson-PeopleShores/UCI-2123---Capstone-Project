@@ -6,4 +6,11 @@ ChatGPT was used primarily as a learning aid during the setup of the React front
 AI tools were also used to generate synthetic mock and dummy data for the MySQL database tables (venues, events, tickets, users, and ticket sales). This data was used exclusively for development and testing purposes, including pagination, filtering, analytics, and edge-case validation. The generated data was reviewed and adjusted as needed before being integrated into the project.
 The database schema was initially exported from DrawSQL and later refactored to follow SQL and Java naming conventions (snake_case, lowercase) to ensure compatibility with MySQL and Spring Boot JPA. This refactor did not change any functional behavior.
 Overall, AI tools were used to support learning, validation, and efficiency, not to replace independent implementation or decision-making.
-M365 Copilot was given the original documentation, to polish it.
+M365 Copilot was given the original documentation, to polish it. M365 Copilot was used in creating mocking data for the database "capstone_improved". A combination of M365 copilot and the website drawSQL was used to setup and polish the initial ERD and database tables. The design was created within drawSQL then exported.
+
+=========
+
+Setup - 
+To setup the "capstone_improved" database run the "SETUP-CapstoneDatabase.sql" file in the folder "Capstone ERD" in MySQL, to setup the initial database. 
+NOTE: the file generates different mock data every time it is ran.
+NOTE: Springboot and the backend uses java "corretto-21" (Amazon Corretto 21.0.10) as the SDK in IntelliJ.

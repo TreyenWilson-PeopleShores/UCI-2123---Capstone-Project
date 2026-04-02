@@ -1,0 +1,31 @@
+{
+    "schema": "capstone_improved",
+    "includesDdl": true,
+    "includesViewsDdl": true,
+    "includesData": true,
+    "multifileDdl": false,
+    "tables": [
+        "events",
+        "tickets",
+        "tickets_sold",
+        "users",
+        "venues"
+    ],
+    "views": [],
+    "events": [],
+    "functions": [],
+    "functionDependencies": {},
+    "procedures": [
+        "seed_events",
+        "seed_ticket_sales"
+    ],
+    "procedureDependencies": {},
+    "libraries": [],
+    "basenames": {
+        "events": "capstone_improved@events",
+        "tickets": "capstone_improved@tickets",
+        "tickets_sold": "capstone_improved@tickets_sold",
+        "users": "capstone_improved@users",
+        "venues": "capstone_improved@venues"
+    }
+}
