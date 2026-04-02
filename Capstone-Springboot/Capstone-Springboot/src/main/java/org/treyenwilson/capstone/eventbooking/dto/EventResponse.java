@@ -7,7 +7,8 @@ public class EventResponse {
     private Long id;
     private LocalDateTime date;
     private String status;
-//    private String name;
+    private Long total_spots;
+    private Long venue_id;
 //    private String description;
 //
 //    private String venue;
@@ -24,12 +25,15 @@ public class EventResponse {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
-    /*
 
 
-    public Long getTotal_capacity() { return total_capacity; }
-    public void setTotal_capacity(Long total_capacity) { this.total_capacity = total_capacity; }
-    public Long getTickets_sold() { return tickets_sold; }
+
+    public Long getTotal_spots() { return total_spots; }
+    public void setTotal_spots(Long total_spots) { this.total_spots = total_spots; }
+    public Long getVenue_id() { return venue_id; }
+    public void setVenue_id(Long venue_id) { this.venue_id = venue_id; }
+
+    /*  public Long getTickets_sold() { return tickets_sold; }
     public void setTickets_sold(Long tickets_sold) { this.tickets_sold = tickets_sold; }
 
     public String getName() { return name; }

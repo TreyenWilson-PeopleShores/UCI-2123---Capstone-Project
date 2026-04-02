@@ -20,9 +20,13 @@ public class EventController {
     public List<Event> getAllEvents(){
         return  eventService.getAllEvents();
     }
-    @GetMapping("/{id}") // .../api/events/1
+    @GetMapping("id/{id}") // .../api/events/1
     public Event getByEventId(@PathVariable Long id){
         return eventService.getByEventId(id);
+    }
+    @GetMapping("status/{status}") // .../api/events/1
+    public List<Event> getByEventStatus(@PathVariable String status){
+        return eventService.getByEventStatus(status);
     }
     /*@GetMapping // This is .../api/events?id=1
     public Event getByEventId(@RequestParam Long id){
