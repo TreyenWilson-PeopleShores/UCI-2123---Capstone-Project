@@ -7,7 +7,7 @@ AI tools were also used to generate synthetic mock and dummy data for the MySQL 
 The database schema was initially exported from DrawSQL and later refactored to follow SQL and Java naming conventions (snake_case, lowercase) to ensure compatibility with MySQL and Spring Boot JPA. This refactor did not change any functional behavior.
 Overall, AI tools were used to support learning, validation, and efficiency, not to replace independent implementation or decision-making.
 M365 Copilot was given the original documentation, to polish it. M365 Copilot was used in creating mocking data for the database "capstone_improved". A combination of M365 copilot and the website drawSQL was used to setup and polish the initial ERD and database tables. The design was created within drawSQL then exported.
-
+M365 was used to help setup the dev branch on GitHub.
 =========
 
 Setup - 
