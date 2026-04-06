@@ -1,0 +1,45 @@
+✅ A “No Scope Creep” Checklist (Follow This)
+Use this exact order — don’t skip around.
+✅ Step 1: Finish the Events Table (Close It Completely)
+
+ - Add pagination to date-range endpoint
+ - Add validation annotations to Event entity
+ - Add global error handling (@ControllerAdvice)
+ - Ensure all event endpoints return clean HTTP statuses
+
+📌 When this is done:
+
+“Events are production-ready.”
+
+==================
+
+✅ Step 2: Add ONE New Table (Users OR Venues — not both)
+For the next table:
+
+Schema
+Entity
+Repository
+Service
+Controller
+Validation
+Error handling
+Basic pagination
+
+Then stop.
+
+✅ Step 3: Relationships (Only After Both Sides Exist)
+Only once Events + Venues (or Users) exist:
+
+Add @ManyToOne
+Add @OneToMany
+Test joins
+Do NOT add business logic yet
+
+
+✅ Step 4: Then — and only then — Phase 4 Topics
+
+Password encryption
+Security
+JWT
+
+You are correct: those belong later.

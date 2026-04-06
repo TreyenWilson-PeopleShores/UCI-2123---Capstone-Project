@@ -22,6 +22,8 @@ NOTE: Springboot and the backend uses java "corretto-21" (Amazon Corretto 21.0.1
 
 Pagination was implemented using Spring Data JPA’s Pageable and Page<T> abstractions, based on official documentation and online examples, and adapted to the project’s event domain.
 
+M365 Copilot was used to help create the project proposal.
+
 === PROTOTYPE SETUP - BY M365 COPILOT ===
 
 Frontend Setup (React + NPM Follow‑Along)

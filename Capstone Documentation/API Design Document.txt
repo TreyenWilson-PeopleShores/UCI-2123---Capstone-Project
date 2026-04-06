@@ -1,0 +1,17 @@
+Initial endpoints implemented for Events. Additional endpoints for Users, Venues, and Bookings will follow the same REST pattern.
+
+Get an event by ID (no pagination):
+http://localhost:8080/api/events/id/{id}
+
+Get all events (pagination supported):
+http://localhost:8080/api/events
+Example:
+http://localhost:8080/api/events?page=0&size=5&sortBy=date&ascending=false
+
+Get events by status (pagination supported):
+http://localhost:8080/api/events/status/{COMPLETED | CANCELLED | SCHEDULED}
+Example:
+http://localhost:8080/api/events/status/cancelled?page=0&size=5
+
+Get events between two dates (pagination planned):
+http://localhost:8080/api/events/date?start=2020-01-07&end=2020-02-08

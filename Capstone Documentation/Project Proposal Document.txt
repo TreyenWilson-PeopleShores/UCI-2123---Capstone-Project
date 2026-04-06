@@ -1,0 +1,73 @@
+# **Project Proposal – Event Booking Platform**
+
+## **1. Problem Statement & Business Justification**
+
+Many organizations and venues struggle to manage events efficiently due to fragmented systems for scheduling, availability tracking, and user discovery. Event organizers need a centralized platform to publish events, manage capacity, and track event status (scheduled, completed, cancelled). Users need a reliable way to browse events by date, status, and availability.
+
+This project aims to build a full‑stack **Event Booking Platform** that allows users to browse and filter events while enabling organizers to manage event listings efficiently. The system improves operational clarity, scalability, and user experience by centralizing event data and exposing it through a robust API.
+
+***
+
+## **2. Target Users**
+
+*   **Event Attendees** – users browsing and selecting events to attend
+*   **Event Organizers** – users managing event listings and availability
+*   **System Administrators** – users overseeing system data and operations
+
+***
+
+## **3. User Stories (Minimum 8)**
+
+1.  As an event attendee, I want to view a list of upcoming events so that I can discover events to attend.
+2.  As an event attendee, I want to filter events by date range so that I can see events happening in a specific month.
+3.  As an event attendee, I want to filter events by status (scheduled, completed, cancelled) so that I only see relevant events.
+4.  As an event attendee, I want event listings to be paginated so that large result sets are easy to navigate.
+5.  As an event organizer, I want to create and manage events so that I can publish accurate event information.
+6.  As an event organizer, I want to define total available spots for an event so that capacity is enforced.
+7.  As a system administrator, I want to view all events in the system so that I can monitor system usage.
+8.  As a system administrator, I want the system to handle large volumes of events efficiently so that performance remains acceptable as usage grows.
+
+***
+
+## **4. Functional Requirements (Minimum 10)**
+
+1.  The system shall allow users to retrieve a list of all events.
+2.  The system shall support pagination for event listings.
+3.  The system shall allow sorting of events by date.
+4.  The system shall allow filtering events by status.
+5.  The system shall allow filtering events by a date range.
+6.  The system shall store event data in a relational database.
+7.  The system shall expose RESTful API endpoints for event operations.
+8.  The system shall support viewing event details by event ID.
+9.  The system shall support combining filters (date, status, pagination).
+10. The system shall validate request parameters and handle errors gracefully.
+
+***
+
+## **5. Non‑Functional Requirements**
+
+### **Performance**
+
+*   The system should efficiently handle large datasets using pagination and database‑level filtering.
+
+### **Scalability**
+
+*   The system should be designed to support future expansion, including additional entities such as users and tickets.
+
+### **Security**
+
+*   The system should be designed with future authentication and authorization in mind, even if not implemented in the initial phase.
+
+### **Maintainability**
+
+*   The system should follow layered architecture (controller, service, repository) for clarity and maintainability.
+
+***
+
+## **6. Out‑of‑Scope Items**
+
+*   Payment processing
+*   Real‑time seat selection
+*   Notification systems (email/SMS)
+*   Advanced analytics dashboards
+*   Role‑based authentication (planned for future phases)
