@@ -13,5 +13,9 @@ http://localhost:8080/api/events/status/{COMPLETED | CANCELLED | SCHEDULED}
 Example:
 http://localhost:8080/api/events/status/cancelled?page=0&size=5
 
-Get events between two dates (pagination planned):
+Get events between two dates (pagination supported):
 http://localhost:8080/api/events/date?start=2020-01-07&end=2020-02-08
+Example:
+http://localhost:8080/api/events/date?start=2020-01-07&end=2020-02-08&page=0
+Note: Results are not currently ordered unless a sort is specified.
+
