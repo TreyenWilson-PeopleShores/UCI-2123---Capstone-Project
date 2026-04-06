@@ -16,7 +16,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     Page<Event> findByStatus(Pageable pageable, String status);
 
-    List<Event> findByDateBetween(LocalDate start, LocalDate end);
+    Page<Event> findByDateBetween(LocalDate start, LocalDate end, Pageable pageable);
 
 
     //    @Query("SELECT events from events where"+

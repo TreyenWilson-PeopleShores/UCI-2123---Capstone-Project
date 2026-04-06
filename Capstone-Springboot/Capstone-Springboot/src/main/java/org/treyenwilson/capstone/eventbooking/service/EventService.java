@@ -47,8 +47,8 @@ public class EventService {
 
 
 
-    public List<Event> filterByDate(LocalDate start, LocalDate end) {
+    public Page<Event> filterByDate(LocalDate start, LocalDate end, Pageable pageable) {
 
-        return eventRepository.findByDateBetween(start, end);
+        return eventRepository.findByDateBetween(start, end, pageable);
     }
 }

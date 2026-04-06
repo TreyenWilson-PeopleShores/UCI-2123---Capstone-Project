@@ -34,11 +34,16 @@ public class EventController {
 
     @GetMapping("date")
     // Example call: http://localhost:8080/api/events/date?start=2020-01-07&end=2020-02-08
-    public List<Event> filterByDate(
+    public Page<Event> filterByDate(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy
     ){
-        return eventService.filterByDate(start, end);
+        //Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size);
+        return eventService.filterByDate(start, end, pageable);
     }
 
     // Adds Support for pagination below
