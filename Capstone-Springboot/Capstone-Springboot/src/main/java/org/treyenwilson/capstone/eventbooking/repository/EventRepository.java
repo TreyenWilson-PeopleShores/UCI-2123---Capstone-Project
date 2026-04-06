@@ -6,6 +6,8 @@ import org.springframework.stereotype.Repository;
 import org.treyenwilson.capstone.eventbooking.entity.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -13,6 +15,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     //List<Event> findByStatus(String status);
 
     Page<Event> findByStatus(Pageable pageable, String status);
+
+    List<Event> findByDateBetween(LocalDate start, LocalDate end);
+
 
     //    @Query("SELECT events from events where"+
 //    "(:status = 'CANCELLED')");

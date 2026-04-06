@@ -9,6 +9,8 @@ import org.springframework.web.server.ResponseStatusException;
 import org.treyenwilson.capstone.eventbooking.entity.Event;
 import org.treyenwilson.capstone.eventbooking.repository.EventRepository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -41,5 +43,12 @@ public class EventService {
     }
     public Page<Event> findByStatus(Pageable pageable, String status) {
         return eventRepository.findByStatus(pageable, status);
+    }
+
+
+
+    public List<Event> filterByDate(LocalDate start, LocalDate end) {
+
+        return eventRepository.findByDateBetween(start, end);
     }
 }

@@ -3,11 +3,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import org.treyenwilson.capstone.eventbooking.dto.EventResponse;
 import org.treyenwilson.capstone.eventbooking.entity.Event;
 import org.treyenwilson.capstone.eventbooking.service.EventService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
@@ -34,7 +37,14 @@ public class EventController {
 //        return eventService.getByEventStatus(status);
 //    } Old method for checking status above
 
-
+    @GetMapping("date")
+    // Example call: http://localhost:8080/api/events/date?start=2020-01-07&end=2020-02-08
+    public List<Event> filterByDate(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end
+    ){
+        return eventService.filterByDate(start, end);
+    }
 
     // Adds Support for pagination below
     @GetMapping

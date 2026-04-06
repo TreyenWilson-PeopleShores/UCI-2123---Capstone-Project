@@ -1,11 +1,12 @@
 package org.treyenwilson.capstone.eventbooking.dto;
+import java.time.LocalDate;
 import java.util.List;
 
 import java.time.LocalDateTime;
 
 public class EventResponse {
     private Long id;
-    private LocalDateTime date;
+    private LocalDate date;
     private String status;
     private Long total_spots;
     private Long venue_id;
@@ -20,8 +21,8 @@ public class EventResponse {
     public EventResponse(){}
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public LocalDateTime getDate() { return date; }
-    public void setDate(LocalDateTime date) { this.date = date; }
+    public LocalDate getDate() { return date; }
+    public void setDate(LocalDate date) { this.date = date; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
