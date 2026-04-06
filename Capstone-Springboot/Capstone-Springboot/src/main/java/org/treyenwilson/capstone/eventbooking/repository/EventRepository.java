@@ -10,7 +10,9 @@ import java.util.List;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
-    List<Event> findByStatus(String status);
+    //List<Event> findByStatus(String status);
+
+    Page<Event> findByStatus(Pageable pageable, String status);
 
     //    @Query("SELECT events from events where"+
 //    "(:status = 'CANCELLED')");

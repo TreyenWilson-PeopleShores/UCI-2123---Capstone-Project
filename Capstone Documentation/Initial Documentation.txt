@@ -20,6 +20,8 @@ To setup the "capstone_improved" database run the "SETUP-CapstoneDatabase.sql" f
 NOTE: the file generates different mock data every time it is ran.
 NOTE: Springboot and the backend uses java "corretto-21" (Amazon Corretto 21.0.10) as the SDK in IntelliJ.
 
+Pagination was implemented using Spring Data JPA’s Pageable and Page<T> abstractions, based on official documentation and online examples, and adapted to the project’s event domain.
+
 === PROTOTYPE SETUP - BY M365 COPILOT ===
 
 Frontend Setup (React + NPM Follow‑Along)

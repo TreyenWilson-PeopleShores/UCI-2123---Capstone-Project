@@ -29,13 +29,17 @@ public class EventService {
     }
     @Autowired
     private EventRepository eventRepository;
-    public List<Event> getByEventStatus(String status) {
-        return eventRepository.findByStatus(status);
 
-    }
+//    public List<Event> getByEventStatus(String status) {
+//        return eventRepository.findByStatus(status);
+//
+//    } - old find by status
 
-    // Test code below
+    // Pagination Code
     public Page<Event> findAll(Pageable pageable) {
         return eventRepository.findAll(pageable);
+    }
+    public Page<Event> findByStatus(Pageable pageable, String status) {
+        return eventRepository.findByStatus(pageable, status);
     }
 }
