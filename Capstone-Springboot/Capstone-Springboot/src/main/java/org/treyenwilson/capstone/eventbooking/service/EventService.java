@@ -1,6 +1,8 @@
 package org.treyenwilson.capstone.eventbooking.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -30,5 +32,10 @@ public class EventService {
     public List<Event> getByEventStatus(String status) {
         return eventRepository.findByStatus(status);
 
+    }
+
+    // Test code below
+    public Page<Event> findAll(Pageable pageable) {
+        return eventRepository.findAll(pageable);
     }
 }
