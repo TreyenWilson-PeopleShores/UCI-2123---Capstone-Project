@@ -8,9 +8,9 @@ import java.time.LocalDate;
 
 
 public class EventRequest {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
     @NotNull(message = "You must provide a date")
     private LocalDate date;
 

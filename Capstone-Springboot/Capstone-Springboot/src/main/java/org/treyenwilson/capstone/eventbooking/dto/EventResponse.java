@@ -9,7 +9,8 @@ import java.util.List;
 import java.time.LocalDateTime;
 
 public class EventResponse {
-
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDate date;
     private String status;

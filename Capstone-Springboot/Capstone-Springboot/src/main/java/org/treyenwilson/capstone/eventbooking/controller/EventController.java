@@ -84,6 +84,4 @@ public class EventController {
         Pageable pageable = PageRequest.of(page, size, sort);
         return eventService.findByStatus(pageable, status);
     }
-
-
 }
