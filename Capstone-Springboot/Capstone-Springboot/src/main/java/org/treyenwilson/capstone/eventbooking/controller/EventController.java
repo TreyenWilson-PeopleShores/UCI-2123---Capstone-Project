@@ -20,7 +20,7 @@ public class EventController {
     private final EventService eventService;
     private final EventRepository eventRepository;
 
-    public EventController(EventService eventService, EventRepository eventRepository, EventRepository eventRepository1) {
+    public EventController(EventService eventService, EventRepository eventRepository) {
         this.eventService = eventService;
         this.eventRepository = eventRepository;
     }
