@@ -1,10 +1,16 @@
 package org.treyenwilson.capstone.eventbooking.dto;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.validation.constraints.*;
+import org.springframework.data.annotation.Id;
 
 import java.time.LocalDate;
 
 
 public class EventRequest {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @NotNull(message = "You must provide a date")
     private LocalDate date;
 

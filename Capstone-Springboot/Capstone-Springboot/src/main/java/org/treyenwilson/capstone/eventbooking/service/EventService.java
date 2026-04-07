@@ -56,4 +56,6 @@ public class EventService {
     public Event save(@Valid Event newEvent) {
         return eventRepository.save(newEvent);
     }
+
+
 }

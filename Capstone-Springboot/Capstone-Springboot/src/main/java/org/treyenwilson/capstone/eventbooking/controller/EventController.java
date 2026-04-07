@@ -85,8 +85,5 @@ public class EventController {
         return eventService.findByStatus(pageable, status);
     }
 
-    @DeleteMapping("/id/{id}")
-    void deleteEvent(@PathVariable Long id){ // Not sure if this is needed, as all events should be kept
 
-    }
 }

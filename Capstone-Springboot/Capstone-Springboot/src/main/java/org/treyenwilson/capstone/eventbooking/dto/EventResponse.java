@@ -1,10 +1,15 @@
 package org.treyenwilson.capstone.eventbooking.dto;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import org.springframework.data.annotation.Id;
+
 import java.time.LocalDate;
 import java.util.List;
 
 import java.time.LocalDateTime;
 
 public class EventResponse {
+
     private Long id;
     private LocalDate date;
     private String status;
