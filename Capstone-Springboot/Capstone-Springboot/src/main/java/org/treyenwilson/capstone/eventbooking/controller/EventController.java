@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.treyenwilson.capstone.eventbooking.entity.Event;
+import org.treyenwilson.capstone.eventbooking.repository.EventRepository;
 import org.treyenwilson.capstone.eventbooking.service.EventService;
 import java.time.LocalDate;
 import java.util.List;
@@ -17,17 +18,19 @@ import java.util.List;
 @RequestMapping("/api/events")
 public class EventController {
     private final EventService eventService;
+    private final EventRepository eventRepository;
 
-    public EventController(EventService eventService) {
+    public EventController(EventService eventService, EventRepository eventRepository, EventRepository eventRepository1) {
         this.eventService = eventService;
+        this.eventRepository = eventRepository;
     }
 //    @GetMapping
 //    public List<Event> getAllEvents(){
 //        return  eventService.getAllEvents();
 //    }
     @PostMapping() // .../api/events/1
-    public Event createEvent(@Valid @RequestBody Event event){
-        return new ResponseEntity<>(event, HttpStatus.CREATED).getBody();
+    public Event createEvent(@Valid @RequestBody Event newEvent){
+        return eventRepository.save(newEvent);
     }
 
     @GetMapping("id/{id}") // .../api/events/1
