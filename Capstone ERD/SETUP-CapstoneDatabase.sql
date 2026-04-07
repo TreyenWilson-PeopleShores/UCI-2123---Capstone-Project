@@ -1,5 +1,5 @@
 
-CREATE DATABASE capstone_imrpoved;
+CREATE DATABASE capstone_improved;
 use capstone_improved;
 CREATE TABLE events (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
