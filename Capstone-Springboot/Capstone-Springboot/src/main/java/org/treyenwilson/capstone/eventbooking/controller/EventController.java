@@ -18,11 +18,9 @@ import java.util.List;
 @RequestMapping("/api/events")
 public class EventController {
     private final EventService eventService;
-    private final EventRepository eventRepository;
 
     public EventController(EventService eventService, EventRepository eventRepository) {
         this.eventService = eventService;
-        this.eventRepository = eventRepository;
     }
 //    @GetMapping
 //    public List<Event> getAllEvents(){
@@ -30,7 +28,7 @@ public class EventController {
 //    }
     @PostMapping() // .../api/events/1
     public Event createEvent(@Valid @RequestBody Event newEvent){
-        return eventRepository.save(newEvent);
+        return eventService.save(newEvent);
     }
 
     @GetMapping("id/{id}") // .../api/events/1
@@ -85,5 +83,10 @@ public class EventController {
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
         return eventService.findByStatus(pageable, status);
+    }
+
+    @DeleteMapping("/id/{id}")
+    void deleteEvent(@PathVariable Long id){ // Not sure if this is needed, as all events should be kept
+
     }
 }

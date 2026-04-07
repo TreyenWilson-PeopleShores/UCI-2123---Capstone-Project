@@ -1,5 +1,6 @@
 package org.treyenwilson.capstone.eventbooking.service;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,5 +51,9 @@ public class EventService {
     public Page<Event> filterByDate(LocalDate start, LocalDate end, Pageable pageable) {
 
         return eventRepository.findByDateBetween(start, end, pageable);
+    }
+
+    public Event save(@Valid Event newEvent) {
+        return eventRepository.save(newEvent);
     }
 }
