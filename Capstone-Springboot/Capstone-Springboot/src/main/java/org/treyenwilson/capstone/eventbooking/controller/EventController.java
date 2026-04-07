@@ -1,4 +1,5 @@
 package org.treyenwilson.capstone.eventbooking.controller;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,8 +26,8 @@ public class EventController {
 //        return  eventService.getAllEvents();
 //    }
     @PostMapping() // .../api/events/1
-    public Event createEvent(@RequestBody Event event){
-    return new ResponseEntity<>(event, HttpStatus.CREATED).getBody();
+    public Event createEvent(@Valid @RequestBody Event event){
+        return new ResponseEntity<>(event, HttpStatus.CREATED).getBody();
     }
 
     @GetMapping("id/{id}") // .../api/events/1
