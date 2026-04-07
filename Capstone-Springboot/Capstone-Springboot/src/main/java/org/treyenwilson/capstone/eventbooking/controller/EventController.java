@@ -4,6 +4,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.treyenwilson.capstone.eventbooking.entity.Event;
 import org.treyenwilson.capstone.eventbooking.service.EventService;
@@ -22,6 +24,11 @@ public class EventController {
 //    public List<Event> getAllEvents(){
 //        return  eventService.getAllEvents();
 //    }
+    @PostMapping() // .../api/events/1
+    public Event createEvent(@RequestBody Event event){
+    return new ResponseEntity<>(event, HttpStatus.CREATED).getBody();
+    }
+
     @GetMapping("id/{id}") // .../api/events/1
     public Event getByEventId(@PathVariable Long id){
         return eventService.getByEventId(id);
