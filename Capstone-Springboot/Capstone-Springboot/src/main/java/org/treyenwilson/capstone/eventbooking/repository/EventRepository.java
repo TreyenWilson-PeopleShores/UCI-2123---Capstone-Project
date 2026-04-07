@@ -18,9 +18,5 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     Page<Event> findByDateBetween(LocalDate start, LocalDate end, Pageable pageable);
 
-
-    //    @Query("SELECT events from events where"+
-//    "(:status = 'CANCELLED')");
-
 }
 
