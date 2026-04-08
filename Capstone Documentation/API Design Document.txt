@@ -17,5 +17,22 @@ Get events between two dates (pagination supported):
 http://localhost:8080/api/events/date?start=2020-01-07&end=2020-02-08
 Example:
 http://localhost:8080/api/events/date?start=2020-01-07&end=2020-02-08&page=0
-Note: Results are not currently ordered unless a sort is specified.
 
+
+Create a new event
+POST http://localhost:8080/api/events
+- Creates a new event
+- Input is validated
+- Event ID is generated automatically
+- Returns the created event with HTTP 201 (Created)
+
+
+Update event status (status-only modification)
+PUT http://localhost:8080/api/events/id/{id}/{status}
+
+Example:
+PUT http://localhost:8080/api/events/id/1044/cancelled
+- Updates only the event status
+- Intended for administrative actions (e.g. cancelling an event)
+- Event date and venue are intentionally immutable to preserve historical - accuracy
+- Events are not deleted; cancelled events remain available for reporting and auditing

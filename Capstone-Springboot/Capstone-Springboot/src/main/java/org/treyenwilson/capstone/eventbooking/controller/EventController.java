@@ -29,16 +29,20 @@ public class EventController {
 //        return  eventService.getAllEvents();
 //    }
 
-//    @PostMapping() // .../api/events/1
-//    public Event createEvent(@Valid @RequestBody Event newEvent){
-//        return eventService.save(newEvent);
-//    } - Old way of posting
 
-    @PostMapping()
+    @PostMapping() // post to .../events
     public ResponseEntity<EventResponse> createEvent(@Valid @RequestBody EventRequest request) {
         EventResponse response = eventService.createEvent(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @PutMapping("id/{id}/{status}")
+    // .../id/{id}/{status: cancelled, completed, or scheduled}
+    public ResponseEntity<EventResponse> changeStatus(
+            @PathVariable Long id,
+            @PathVariable String status)
+        {EventResponse response = eventService.changeStatus(id, status);
+        return ResponseEntity.ok(response);}
 
     @GetMapping("id/{id}") // .../api/events/1
     public Event getByEventId(@PathVariable Long id){

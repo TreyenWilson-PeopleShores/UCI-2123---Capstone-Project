@@ -2,9 +2,11 @@ package org.treyenwilson.capstone.eventbooking.service;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.treyenwilson.capstone.eventbooking.dto.EventRequest;
@@ -64,6 +66,14 @@ public class EventService {
 
     public EventResponse createEvent(@Valid EventRequest request) {
         Event event = eventMapper.toEntity(request);
+        Event saved = eventRepository.save(event);
+        return eventMapper.toResponse(saved);
+    }
+
+    public EventResponse changeStatus(Long id, String status) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(); // to add error exception here
+        event.setStatus(status);
         Event saved = eventRepository.save(event);
         return eventMapper.toResponse(saved);
     }
