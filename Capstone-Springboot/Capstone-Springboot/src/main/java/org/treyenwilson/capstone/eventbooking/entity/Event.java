@@ -14,6 +14,7 @@ public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String event_name;
     private LocalDate date;
     private String status;
     private Long total_spots;
@@ -30,17 +31,21 @@ public class Event {
     //getters and setters below
     public Event(){}
 
-    public Event(Long id, LocalDate date, String status, Long total_spots, Long venue_id){
+    public Event(Long id, String event_name, LocalDate date, String status, Long total_spots, Long venue_id){
         this.id = id;
         this.date = date;
         this.status = status;
         this.total_spots = total_spots;
         this.venue_id = venue_id;
+        this.event_name = event_name;
     }
 
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+    public String getEvent_name() { return event_name; }
+    public void setEvent_name(String event_name) { this.event_name = event_name; }
+
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }
     public String getStatus() { return status; }

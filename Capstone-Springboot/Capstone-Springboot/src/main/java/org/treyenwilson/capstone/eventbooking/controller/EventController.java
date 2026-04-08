@@ -8,6 +8,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.treyenwilson.capstone.eventbooking.dto.EventRequest;
+import org.treyenwilson.capstone.eventbooking.dto.EventResponse;
 import org.treyenwilson.capstone.eventbooking.entity.Event;
 import org.treyenwilson.capstone.eventbooking.repository.EventRepository;
 import org.treyenwilson.capstone.eventbooking.service.EventService;
@@ -26,9 +28,16 @@ public class EventController {
 //    public List<Event> getAllEvents(){
 //        return  eventService.getAllEvents();
 //    }
-    @PostMapping() // .../api/events/1
-    public Event createEvent(@Valid @RequestBody Event newEvent){
-        return eventService.save(newEvent);
+
+//    @PostMapping() // .../api/events/1
+//    public Event createEvent(@Valid @RequestBody Event newEvent){
+//        return eventService.save(newEvent);
+//    } - Old way of posting
+
+    @PostMapping()
+    public ResponseEntity<EventResponse> createEvent(@Valid @RequestBody EventRequest request) {
+        EventResponse response = eventService.createEvent(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("id/{id}") // .../api/events/1

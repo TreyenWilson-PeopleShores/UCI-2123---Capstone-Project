@@ -8,6 +8,9 @@ import java.time.LocalDate;
 
 
 public class EventRequest {
+    @NotBlank(message = "You must provide a name for the event")
+    private String event_name;
+
     @NotNull(message = "You must provide a date")
     private LocalDate date;
 
@@ -20,6 +23,8 @@ public class EventRequest {
     @NotNull(message = "You must provide an id from the venue")
     private Long venue_id;
 
+    public String getEvent_name() { return event_name; }
+    public void setEvent_name(String event_name) { this.event_name = event_name; }
 
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }
