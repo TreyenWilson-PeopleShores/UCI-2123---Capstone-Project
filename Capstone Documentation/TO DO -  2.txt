@@ -43,3 +43,12 @@ Security
 JWT
 
 You are correct: those belong later.
+======
+
+
+Do it in this order:
+
+✅ Global error handling
+✅ Confirm validation responses appear in Postman
+✅ Then add case testing
+✅ Freeze Events and use it as the template

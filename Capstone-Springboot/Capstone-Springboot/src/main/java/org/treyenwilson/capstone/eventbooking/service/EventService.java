@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.treyenwilson.capstone.eventbooking.dto.EventRequest;
 import org.treyenwilson.capstone.eventbooking.dto.EventResponse;
 import org.treyenwilson.capstone.eventbooking.entity.Event;
+import org.treyenwilson.capstone.eventbooking.exception.ResourceNotFoundException;
 import org.treyenwilson.capstone.eventbooking.mapper.EventMapper;
 import org.treyenwilson.capstone.eventbooking.repository.EventRepository;
 
@@ -19,7 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
-public class EventService {
+public class EventService{
     private final EventRepository repository;
     private final EventMapper eventMapper;
 
@@ -31,11 +32,21 @@ public class EventService {
     public List<Event> getAllEvents(){
         return  repository.findAll();
     }
+// old get by event
+//    public Event getByEventId(Long id) {
+//        return repository.findById(id)
+//                .orElseThrow(() -> new ResourceNotFoundException("Event", id));
+//    }
 
-    public Event getByEventId(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Test"));
+    //new get by event
+
+    public EventResponse getByEventId(Long id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Event", id));
+        return eventMapper.toResponse(event);
     }
+
+
     @Autowired
     private EventRepository eventRepository;
 

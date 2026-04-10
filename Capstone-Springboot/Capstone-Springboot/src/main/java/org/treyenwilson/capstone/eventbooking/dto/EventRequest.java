@@ -1,9 +1,5 @@
 package org.treyenwilson.capstone.eventbooking.dto;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.validation.constraints.*;
-import org.springframework.data.annotation.Id;
-
 import java.time.LocalDate;
 
 
@@ -22,6 +18,18 @@ public class EventRequest {
 
     @NotNull(message = "You must provide an id from the venue")
     private Long venue_id;
+
+    public EventRequest() {}
+
+    public EventRequest(String event_name, LocalDate date, String status, Long total_spots, Long venue_id) {
+        this.event_name = event_name;
+        this.status = status;
+        this.date = date;
+        this.total_spots = total_spots;
+        this.venue_id = venue_id;
+    }
+
+
 
     public String getEvent_name() { return event_name; }
     public void setEvent_name(String event_name) { this.event_name = event_name; }
