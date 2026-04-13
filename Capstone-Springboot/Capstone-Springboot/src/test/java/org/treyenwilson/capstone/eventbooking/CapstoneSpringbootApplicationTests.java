@@ -41,11 +41,8 @@ public class CapstoneSpringbootApplicationTests {
 
 
     @Test
-    void doesPostWorkGivesTrueIfItDoes() throws Exception {
+    void isGetAbleToGrabAnEventByID() throws Exception {
 
-        String event3 = """
-                {"id":"1","event_name": "An event", "date":"2004-01-01", "status":"COMPLETED", "total_spots":"32137", "venue_id":"1"}
-                """;
 
 
         // Post some mock data to the mock database
@@ -62,6 +59,7 @@ public class CapstoneSpringbootApplicationTests {
                 )
                 .andExpect(status().isCreated()); // Checks for a code of 201
                 // Test for POSTing
+        // POSTing is needed to add to the h2 database for the test GET to pass
 
         mockMvc.perform(get("/api/events/id/1"))
                 .andExpect(status().isOk()); // This shows if GET is PASSing.
@@ -70,4 +68,21 @@ public class CapstoneSpringbootApplicationTests {
 
     }
 
+    @Test
+    void ifPostWorksItReturns201() throws Exception{
+// Post some mock data to the mock database
+        MockitoAnnotations.openMocks(this);
+        Event event1 = new Event(1L,"An event", LocalDate.of(2004,01,01), "COMPLETED", 32137L, 1L);
+        MockitoAnnotations.openMocks(this);
+        Event event2 = new Event(2L,"An event2", LocalDate.of(2007,01,01), "CANCELLED", 337L, 1L);
+
+        String json = new ObjectMapper()
+                .writeValueAsString(event1);
+        mockMvc.perform(post("/api/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                )
+                .andExpect(status().isCreated()); // Checks for a code of 201
+        // Test for POSTing
+    }
 }
