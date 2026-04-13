@@ -61,7 +61,9 @@ public class CapstoneSpringbootApplicationTests {
         mockMvc.perform(post("/api/events")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
-                );
+
+                )
+                .andExpect(status().is2xxSuccessful());
 
 
         mockMvc.perform(get("/api/events/id/1"))
