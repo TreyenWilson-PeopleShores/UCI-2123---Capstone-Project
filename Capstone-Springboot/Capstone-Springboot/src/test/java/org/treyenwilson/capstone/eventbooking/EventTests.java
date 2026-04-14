@@ -2,7 +2,6 @@ package org.treyenwilson.capstone.eventbooking;
 
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,23 +13,17 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.treyenwilson.capstone.eventbooking.entity.Event;
-import org.treyenwilson.capstone.eventbooking.service.EventService;
 import tools.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.web.servlet.function.RequestPredicates.contentType;
-
-
 
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class CapstoneSpringbootApplicationTests {
+public class EventTests {
     @Autowired
     private MockMvc mockMvc;
 

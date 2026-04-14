@@ -10,7 +10,7 @@ public class EventRequest {
     @NotNull(message = "You must provide a date")
     private LocalDate date;
 
-    @NotBlank(message = "You provide a status")
+    @NotBlank(message = "You must provide a status")
     private String status;
 
     @NotNull(message = "Total spots must be more then 0")
