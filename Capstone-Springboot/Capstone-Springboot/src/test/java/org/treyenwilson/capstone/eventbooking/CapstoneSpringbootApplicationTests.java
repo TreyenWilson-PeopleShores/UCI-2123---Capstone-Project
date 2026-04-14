@@ -110,4 +110,19 @@ public class CapstoneSpringbootApplicationTests {
         mockMvc.perform(put("/api/events/id/1/CANCELLED"))
                 .andExpect(status().isOk()); // This shows if PUT is PASSing.
     }
+
+    @Test
+    void doesPostNotCreateAnEventWithMissingDataReturns400() throws Exception{
+// Post some mock data to the mock database
+
+        mockMvc.perform(post("/api/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"event_name": "Test", "status":"COMPLETED"}
+                                """)
+                )
+                .andExpect(status().isBadRequest()); // Checks for a code of 201
+        // Test for POSTing
+    }
+
 }
