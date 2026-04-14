@@ -46,7 +46,7 @@ public class CapstoneSpringbootApplicationTests {
     void doesGetFailAtGrabbingAnEventIdThatDoesNotExistShouldReturn404() throws Exception {
         // Test not passing
 
-        mockMvc.perform(get("/api/events/id/1"))
+        mockMvc.perform(get("/api/events/id/99999999999999999"))
                 .andExpect(status().isNotFound()); // Checks for a code of 201
 
     }
