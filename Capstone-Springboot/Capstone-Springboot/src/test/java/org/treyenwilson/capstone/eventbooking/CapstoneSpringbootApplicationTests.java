@@ -1,5 +1,6 @@
 package org.treyenwilson.capstone.eventbooking;
 
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -11,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.treyenwilson.capstone.eventbooking.entity.Event;
 import org.treyenwilson.capstone.eventbooking.service.EventService;
 import tools.jackson.databind.ObjectMapper;
@@ -39,6 +41,19 @@ public class CapstoneSpringbootApplicationTests {
     private ObjectMapper objectMapper;
 
 
+    @Transactional
+    @Test
+    void doesGetFailAtGrabbingAnEventIdThatDoesNotExistShouldReturn404() throws Exception {
+        // Test not passing
+
+        mockMvc.perform(get("/api/events/id/1"))
+                .andExpect(status().isNotFound()); // Checks for a code of 201
+
+    }
+
+
+
+    @Transactional
     @Test
     void isGetAbleToGrabAnEventByID() throws Exception {
 
@@ -60,11 +75,24 @@ public class CapstoneSpringbootApplicationTests {
                 // Test for POSTing
         // POSTing is needed to add to the h2 database for the test GET to pass
 
-        mockMvc.perform(get("/api/events/id/1"))
+
+        String eventReturned = mockMvc.perform(get("/api/events"))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        //Long CurrentID = objectMapper.readTree(eventReturned).get("id").asLong();
+        int CurrentID =  JsonPath.read(eventReturned, "$.content[0].id");
+
+
+
+        mockMvc.perform(get("/api/events/id/"+CurrentID))
                 .andExpect(status().isOk()); // This shows if GET is PASSing.
 
     }
 
+
+    @Transactional
     @Test
     void ifPostWorksItReturns201() throws Exception{
 // Post some mock data to the mock database
@@ -85,16 +113,14 @@ public class CapstoneSpringbootApplicationTests {
 
 
     // Tests PUT by changing STATUS
-
+    @Transactional
     @Test
     void isPutAbleToModifyAnEventShouldReturn200() throws Exception {
 
 
 
         // Post some mock data to the mock database
-        MockitoAnnotations.openMocks(this);
         Event event1 = new Event(1L,"An event", LocalDate.of(2004,01,01), "COMPLETED", 32137L, 1L);
-        MockitoAnnotations.openMocks(this);
         Event event2 = new Event(2L,"An event2", LocalDate.of(2007,01,01), "CANCELLED", 337L, 1L);
 
         String json = new ObjectMapper()
@@ -107,10 +133,18 @@ public class CapstoneSpringbootApplicationTests {
         // Test for POSTing
         // POSTing is needed to add to the h2 database for the test PUT to pass
 
-        mockMvc.perform(put("/api/events/id/1/CANCELLED"))
+       String eventReturned = mockMvc.perform(get("/api/events"))
+                       .andReturn()
+                            .getResponse()
+                                .getContentAsString();
+
+        //Long CurrentID = objectMapper.readTree(eventReturned).get("id").asLong();
+      int CurrentID =  JsonPath.read(eventReturned, "$.content[0].id");
+
+        mockMvc.perform(put("/api/events/id/"+CurrentID+"/CANCELLED"))
                 .andExpect(status().isOk()); // This shows if PUT is PASSing.
     }
-
+    @Transactional
     @Test
     void doesPostNotCreateAnEventWithMissingDataReturns400() throws Exception{
 // Post some mock data to the mock database
