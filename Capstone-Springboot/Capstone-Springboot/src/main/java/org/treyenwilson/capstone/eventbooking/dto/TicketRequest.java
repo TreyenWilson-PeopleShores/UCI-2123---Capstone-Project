@@ -1,12 +1,19 @@
 package org.treyenwilson.capstone.eventbooking.dto;
+import jakarta.validation.constraints.*;
 
 
 public class TicketRequest {
 
-
+    @NotNull(message = "Event ID is required")
     private Long event_id;
+
+    @NotNull(message = "Price must be provided")
     private Double price;
+
+    @NotNull(message = "Total quantity must be provided")
     private Long total_quantity;
+
+    @NotNull(message = "Sold quantity must be provided")
     private Long sold;
 
     //getters and setters below
