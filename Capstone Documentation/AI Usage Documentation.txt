@@ -1,0 +1,33 @@
+Use of AI Tools (Development Methodology)
+
+AI tools, including a VS Code AI coding agent, were used responsibly and intentionally during the development of this capstone project, in accordance with instructor guidance that allows the use of AI to improve productivity.
+
+AI assistance was used to reduce repetitive and mechanical work, while all architectural decisions, validation logic, and final implementations remained the responsibility of the author. All AI-assisted changes were reviewed, tested, and fully understood before being committed.
+
+The AI coding agent was primarily used for the following tasks:
+
+- Cloning existing, fully working modules when creating new entities. For example, the Events module was copied to create Venues and Tickets.
+- Renaming classes, variables, endpoints, DTOs, repositories, and test files so they matched the correct database tables and column names.
+- Updating imports, constructor injection, and repository generics after copy-paste operations.
+- Aligning Java entity fields with the MySQL schema, including column names, constraints, and data types.
+- Implementing intentional design decisions, such as enforcing a single ticket record per event through database constraints.
+
+The AI coding agent was also used to assist with adding required JPA entity relationships based on the SQL schema, including:
+
+- Adding @ManyToOne and @OneToMany annotations that reflect foreign key relationships.
+- Ensuring relationships matched the database design rather than inventing new structure.
+- Taking serialization recursion into account when entities reference one another.
+
+In addition, the AI agent was used for small, narrowly scoped feature additions under strict constraints:
+
+- Adding an administrative DELETE endpoint for tickets.
+- Adding pagination and optional query-parameter filtering.
+- Making defensive error-handling improvements so invalid input does not crash the API.
+
+Large or convoluted AI-generated changes were explicitly rejected. In cases where an AI response produced excessive or unclear changes, the prompt was refined and re-issued until the resulting diff was minimal, understandable, and consistent with existing project patterns.
+
+AI tools were also used to help adapt and update integration tests for new entities. Existing MockMvc test patterns from the Events module were reused and adjusted for Venues and Tickets. All endpoints were verified using automated tests and manual testing through Postman.
+
+Throughout development, the author maintained full oversight and responsibility for all code. Every AI-assisted change was reviewed line-by-line, validated through testing, and accepted only if the behavior was fully understood. AI tools were used as a productivity aid similar to IDE tooling or documentation references, not as a substitute for reasoning or design decisions.
+
+The author can clearly explain and justify all implemented entities, relationships, endpoints, validation rules, and test behavior. All final code and documentation reflect the author’s understanding and ownership of the system.
