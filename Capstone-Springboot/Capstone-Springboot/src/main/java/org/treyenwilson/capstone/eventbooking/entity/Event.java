@@ -1,4 +1,6 @@
 package org.treyenwilson.capstone.eventbooking.entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.NotFound;
 import jakarta.validation.constraints.NotBlank;
@@ -19,6 +21,17 @@ public class Event {
     private String status;
     private Long total_spots;
     private Long venue_id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "venue_id", insertable = false, updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JsonIgnoreProperties({"events"})
+    private Venue venue;
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private java.util.List<Ticket> tickets;
+
 //    @NotBlank
 //    private String name;
 //    private String description;
@@ -56,6 +69,13 @@ public class Event {
 
     public Long getVenue_id() { return venue_id; }
     public void setVenue_id(Long venue_id) { this.venue_id = venue_id; }
+
+    public Venue getVenue() { return venue; }
+    public void setVenue(Venue venue) { this.venue = venue; }
+
+    public java.util.List<Ticket> getTickets() { return tickets; }
+    public void setTickets(java.util.List<Ticket> tickets) { this.tickets = tickets; }
+
 //    public Long getTickets_sold() { return tickets_sold; }
 //    public void setTickets_sold(Long tickets_sold) { this.tickets_sold = tickets_sold; }
 //

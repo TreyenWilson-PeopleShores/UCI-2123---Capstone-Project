@@ -70,4 +70,6 @@ This project aims to build a full‑stack **Event Booking Platform** that allows
 *   Real‑time seat selection
 *   Notification systems (email/SMS)
 *   Advanced analytics dashboards
-*   Role‑based authentication (planned for future phases)
+*   Role‑based authentication
+*   Multiple types of tickets for a single event
+*   Password reset (would require email/SMS)

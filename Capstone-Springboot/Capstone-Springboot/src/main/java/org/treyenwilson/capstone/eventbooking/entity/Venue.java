@@ -1,4 +1,5 @@
 package org.treyenwilson.capstone.eventbooking.entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
@@ -11,6 +12,10 @@ public class Venue {
     private String venue_name;
     private String location;
     private Long total_capacity;
+
+    @OneToMany(mappedBy = "venue", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private java.util.List<Event> events;
 
 
     //getters and setters below
@@ -34,6 +39,7 @@ public class Venue {
     public Long getTotal_capacity() { return total_capacity; }
     public void setTotal_capacity(Long total_capacity) { this.total_capacity = total_capacity; }
 
-
+    public java.util.List<Event> getEvents() { return events; }
+    public void setEvents(java.util.List<Event> events) { this.events = events; }
 
 }

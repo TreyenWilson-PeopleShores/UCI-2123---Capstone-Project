@@ -22,23 +22,27 @@ public class VenueController {
     }
 
     @GetMapping("id/{id}")
+    // Example call: http://localhost:8080/api/venues/1
     public ResponseEntity<VenueResponse> getByVenueId(@PathVariable Long id){
         return ResponseEntity.ok(venueService.getByVenueId(id));
     }
 
     @PostMapping()
+    // Example call: POST http://localhost:8080/api/venues with JSON body
     public ResponseEntity<VenueResponse> createVenue(@Valid @RequestBody VenueRequest request) {
         VenueResponse response = venueService.createVenue(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("id/{id}/{location}")
+    // Example call: PUT http://localhost:8080/api/venues/1/Los%20Angeles
     public ResponseEntity<VenueResponse> changeLocation(@PathVariable Long id, @PathVariable String location) {
         VenueResponse response = venueService.changeLocation(id, location);
         return ResponseEntity.ok(response);
-    }
+    } // Not recommended for use. Use .../venues?city=...state=... Which achieves the same functionality without spaces (%20) inside the URL
 
     @GetMapping
+    // Example call: http://localhost:8080/api/venues?page=0&size=10&sortBy=capacity&ascending=false&city=Los%20Angeles
     public Page<Venue> getAllVenues(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -82,6 +86,7 @@ public class VenueController {
     }
 
     @GetMapping("location/{location}")
+    // Example call: http://localhost:8080/api/venues/location/Los%20Angeles?page=0&size=5&sortBy=name&ascending=true
     public Page<Venue> getByVenueLocation(
             @PathVariable String location,
             @RequestParam(defaultValue = "0") int page,

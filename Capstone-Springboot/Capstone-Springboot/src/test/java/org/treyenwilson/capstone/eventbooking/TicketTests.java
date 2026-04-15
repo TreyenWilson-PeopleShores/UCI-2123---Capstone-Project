@@ -155,6 +155,34 @@ public class TicketTests {
         mockMvc.perform(put("/api/tickets/id/"+CurrentID+"/sold/20000"))
                 .andExpect(status().isOk()); // Expect HTTP 200 OK for successful update
     }
+
+    @Transactional
+    @Test
+    void isDeleteAbleToRemoveATicketShouldReturn204() throws Exception {
+        Ticket ticket1 = new Ticket(1L, 1L, 48.86, 16696L, 15437L);
+
+        String json = new ObjectMapper()
+                .writeValueAsString(ticket1);
+        mockMvc.perform(post("/api/tickets")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                )
+                .andExpect(status().isCreated());
+
+        String ticketReturned = mockMvc.perform(get("/api/tickets"))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        int CurrentID = JsonPath.read(ticketReturned, "$.content[0].id");
+
+        mockMvc.perform(delete("/api/tickets/delete/" + CurrentID))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/tickets/id/" + CurrentID))
+                .andExpect(status().isNotFound());
+    }
+
     @Transactional
     @Test
     void doesPostNotCreateATicketWithMissingDataReturns400() throws Exception{

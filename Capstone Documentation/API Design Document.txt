@@ -41,132 +41,219 @@ PUT http://localhost:8080/api/events/id/1044/cancelled
 
 
 ========
-Below are the API endpoints for Venue
 
-Got it 👍 — thanks for calling that out.  
-Below is the **Venue section rewritten to EXACTLY match the style of your existing API Design Document**, with **full URLs everywhere**, no shorthand paths, and **only features you’ve confirmed are working**.
+## **Venues API Endpoints**
 
-You can **copy‑paste this directly** into `API Design Document.txt` under the Events section.
+Get a venue by ID (no pagination):
 
-***
-
-# **Venues API Endpoints**
-
-***
-
-### Get a venue by ID (no pagination)
-
-    GET http://localhost:8080/api/venues/id/{id}
-
-**Description**
+    http://localhost:8080/api/venues/id/{id}
 
 *   Returns a single venue by its ID
-*   Returns **200 OK** if the venue exists
-*   Returns **404 Not Found** if the venue does not exist
+*   Returns 200 OK if the venue exists
+*   Returns 404 Not Found if the venue does not exist
 
-**Example**
+Example:
 
-    http://localhost:8080/api/venues/id/4
-
-***
-
-### Get all venues (pagination supported)
-
-    GET http://localhost:8080/api/venues
-
-**Query Parameters**
-
-*   `page` (default: `0`)
-*   `size` (default: `10`)
-*   `sortBy` (default: `id`)
-*   `ascending` (default: `true`)
-
-**Important Note**
-
-*   The `sortBy` parameter must match a **Venue entity field name**, not a database column name.
-*   Valid examples include:
-    *   `venueName`
-    *   `location`
-    *   `totalCapacity`
-
-**Example**
-
-    http://localhost:8080/api/venues?page=0&size=5&sortBy=venue_name
+    http://localhost:8080/api/venues/id/1
 
 ***
 
-### Get venues by location (pagination supported)
+Get all venues (pagination supported):
 
-    GET http://localhost:8080/api/venues/location/{location}
+    http://localhost:8080/api/venues
 
-**Description**
+Query parameters (all optional):
 
-*   Returns venues filtered by location
-*   Results are paginated and sortable
+*   `page` (default: 0)
+*   `size` (default: 10)
+*   `sortBy` (default: id)
+*   `ascending` (default: true)
+*   `city`
+*   `state`
 
-**Example**
+Description:
 
-    http://localhost:8080/api/venues/location/Columbus?page=0&size=5
+*   Returns a paginated list of venues
+*   Supports sorting using Java entity field names
+*   Supports filtering by city and/or state
+
+Examples:
+
+    http://localhost:8080/api/venues?page=0&size=5
+    http://localhost:8080/api/venues?city=Columbus
+    http://localhost:8080/api/venues?state=OH
 
 ***
 
-### Create a new venue
+Create a new venue:
 
     POST http://localhost:8080/api/venues
-
-**Description**
 
 *   Creates a new venue
 *   Input is validated
 *   Venue ID is generated automatically
-*   Returns the created venue with **HTTP 201 (Created)**
+*   Returns the created venue with HTTP 201 (Created)
 
-**Example Request Body**
+Example request body:
 
-```json
-{
-  "venue_name": "Nationwide Arena",
-  "location": "Columbus, OH",
-  "total_capacity": 20000
-}
-```
+    {
+      "venue_name": "Nationwide Arena",
+      "location": "Columbus, OH",
+      "total_capacity": 20000
+    }
 
 ***
 
-### Update venue location (location‑only modification)
+Update venue location (location‑only modification):
 
     PUT http://localhost:8080/api/venues/id/{id}/{location}
 
-**Description**
-
-*   Updates **only** the venue location
+*   Updates only the venue location
 *   Intended for administrative corrections
 *   Other venue fields remain unchanged
-*   Returns **200 OK**
+*   Returns 200 OK
 
-**Example**
+Example:
 
-    http://localhost:8080/api/venues/id/4/Cleveland, OH
-
-***
-
-### Venue Response Example
-
-```json
-{
-  "id": 4,
-  "venue_name": "Riverfront Pavilion",
-  "location": "Cincinnati, OH",
-  "total_capacity": 12000
-}
-```
+    http://localhost:8080/api/venues/id/1/Los%20Angeles
 
 ***
 
-## ✅ Current Scope Notes (Intentional)
+Get venues by location (legacy endpoint – not recommended):
 
-*   Venues are **created, retrieved, updated (location only)**.
-*   No DELETE endpoint is provided.
-*   Pagination is supported on list endpoints.
-*   Sorting is supported using **entity field names**.
-*   Additional filters (e.g. city/state query parameters) are **planned for future enhancement** but are not yet implemented.
+    http://localhost:8080/api/venues/location/{location}
+
+*   Returns venues filtered by full location string
+*   Pagination and sorting supported
+*   This endpoint is maintained for compatibility, but query‑parameter filtering (`city` / `state`) is preferred
+
+Example:
+
+    http://localhost:8080/api/venues/location/Columbus,%20OH?page=0&size=5
+
+***
+
+Notes (Venues):
+
+*   Venues can be created, retrieved, and updated (location only).
+*   Venues are not deleted.
+*   Pagination and sorting are supported.
+*   Query‑parameter filtering by city/state is the preferred approach.
+
+***
+
+## **Tickets API Endpoints**
+
+Get a ticket by ID (no pagination):
+
+    http://localhost:8080/api/tickets/id/{id}
+
+*   Returns a single ticket by its ID
+*   Returns 200 OK if the ticket exists
+*   Returns 404 Not Found if the ticket does not exist
+
+Example:
+
+    http://localhost:8080/api/tickets/id/1
+
+***
+
+Get all tickets (pagination supported):
+
+    http://localhost:8080/api/tickets
+
+Query parameters (all optional):
+
+*   `page` (default: 0)
+*   `size` (default: 10)
+*   `sortBy` (default: id)
+*   `ascending` (default: true)
+*   `minPrice`
+*   `maxPrice`
+
+Description:
+
+*   Returns a paginated list of tickets
+*   Supports optional price range filtering
+*   Sorting uses Java entity field names
+
+Examples:
+
+    http://localhost:8080/api/tickets?page=0&size=5
+    http://localhost:8080/api/tickets?minPrice=20.00
+    http://localhost:8080/api/tickets?maxPrice=50.00
+
+***
+
+Get tickets by event ID (pagination supported):
+
+    http://localhost:8080/api/tickets/event/{event_id}
+
+*   Returns the ticket record associated with a specific event
+*   Each event has at most one ticket record
+*   Pagination metadata is included in the response
+
+Example:
+
+    http://localhost:8080/api/tickets/event/1?page=0&size=5
+
+***
+
+Create a new ticket:
+
+    POST http://localhost:8080/api/tickets
+
+*   Creates a ticket record for an event
+*   Each event may have only one ticket record (enforced by a unique constraint on `event_id`)
+*   Input is validated
+*   Ticket ID is generated automatically
+*   Returns the created ticket with HTTP 201 (Created)
+
+Example request body:
+
+    {
+      "event_id": 1,
+      "price": 48.86,
+      "total_quantity": 100,
+      "sold": 10
+    }
+
+***
+
+Update ticket sold count (sold‑only modification):
+
+    PUT http://localhost:8080/api/tickets/id/{id}/sold/{sold}
+
+*   Updates only the number of tickets sold
+*   Intended for administrative updates
+*   Other ticket fields remain unchanged
+*   Returns 200 OK
+
+Example:
+
+    http://localhost:8080/api/tickets/id/1/sold/50
+
+***
+
+Delete a ticket:
+
+    DELETE http://localhost:8080/api/tickets/delete/{id}
+
+*   Deletes a ticket record by ID
+*   Intended for administrative cleanup
+*   Returns HTTP 204 (No Content)
+
+Example:
+
+    http://localhost:8080/api/tickets/delete/1
+
+***
+
+Notes (Tickets):
+
+*   Tickets represent ticket inventory for an event, not individual purchases.
+*   Each event may have only one ticket record.
+*   Pagination and sorting are supported on list endpoints.
+*   Tickets may be deleted via an administrative endpoint.
+
+***

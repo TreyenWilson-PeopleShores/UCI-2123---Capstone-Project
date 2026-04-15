@@ -64,4 +64,11 @@ public class TicketService{
         return ticketMapper.toResponse(saved);
     }
 
+    public void deleteTicket(Long id) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Ticket", id);
+        }
+        repository.deleteById(id);
+    }
+
 }

@@ -22,23 +22,34 @@ public class TicketController {
     }
 
     @GetMapping("id/{id}")
+    // Example call: http://localhost:8080/api/tickets/1
     public ResponseEntity<TicketResponse> getByTicketId(@PathVariable Long id){
         return ResponseEntity.ok(ticketService.getByTicketId(id));
     }
 
     @PostMapping()
+    // Example call: POST http://localhost:8080/api/tickets with JSON body
     public ResponseEntity<TicketResponse> createTicket(@Valid @RequestBody TicketRequest request) {
         TicketResponse response = ticketService.createTicket(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("id/{id}/sold/{sold}")
+    // Example call: PUT http://localhost:8080/api/tickets/1/sold/50
     public ResponseEntity<TicketResponse> updateSoldCount(@PathVariable Long id, @PathVariable Long sold) {
         TicketResponse response = ticketService.updateSoldCount(id, sold);
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("delete/{id}")
+    // Example call: DELETE http://localhost:8080/api/tickets/delete/1
+    public ResponseEntity<Void> deleteTicket(@PathVariable Long id) {
+        ticketService.deleteTicket(id);
+        return ResponseEntity.noContent().build();
+    } // For admins only
+
     @GetMapping
+    // Example call: http://localhost:8080/api/tickets?page=0&size=10&sortBy=price&ascending=false&minPrice=10.0
     public Page<Ticket> getAllTickets(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -82,6 +93,7 @@ public class TicketController {
     }
 
     @GetMapping("event/{event_id}")
+    // Example call: http://localhost:8080/api/tickets/event/1?page=0&size=5&sortBy=price&ascending=true
     public Page<Ticket> getByEventId(
             @PathVariable Long event_id,
             @RequestParam(defaultValue = "0") int page,

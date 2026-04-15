@@ -1,4 +1,5 @@
 package org.treyenwilson.capstone.eventbooking.entity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
@@ -12,6 +13,12 @@ public class Ticket {
     private Double price;
     private Long total_quantity;
     private Long sold;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_id", insertable = false, updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JsonIgnoreProperties({"tickets"})
+    private Event event;
 
 
     //getters and setters below
@@ -30,6 +37,9 @@ public class Ticket {
     public void setId(Long id) { this.id = id; }
     public Long getEvent_id() { return event_id; }
     public void setEvent_id(Long event_id) { this.event_id = event_id; }
+
+    public Event getEvent() { return event; }
+    public void setEvent(Event event) { this.event = event; }
 
     public Double getPrice() { return price; }
     public void setPrice(Double price) { this.price = price; }
