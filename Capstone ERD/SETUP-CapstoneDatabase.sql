@@ -61,7 +61,8 @@ ALTER TABLE tickets_sold
 ADD CONSTRAINT tickets_sold_ticket_id_foreign
 FOREIGN KEY (ticket_id) REFERENCES tickets (id);
 
-
+-- Below is some mock data that M365 provided. It generates random mock data for the database. I wrote the connections
+-- and limits above.
 -- ===========================
 -- BASE DATA: VENUES + USERS
 -- ===========================
@@ -304,18 +305,3 @@ END $$
 DELIMITER ;
 
 CALL seed_ticket_sales();
-
--- =========================================================
--- QUICK CHECKS (optional)
--- =========================================================
--- How many events?
--- SELECT COUNT(*) AS total_events FROM events;
-
--- Status distribution
--- SELECT status, COUNT(*) AS cnt FROM events GROUP BY status;
-
--- Verify no double-booking
--- SELECT venue_id, date, COUNT(*) c FROM events GROUP BY venue_id, date HAVING c > 1;
-
--- A few cancelled examples
--- SELECT id, event_name, date, venue_id FROM events WHERE status='CANCELLED' ORDER BY date LIMIT 20;
