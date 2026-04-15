@@ -64,9 +64,26 @@ public class EventController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "true") boolean ascending
     ){
-        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-        return eventService.filterByDate(start, end, pageable);
+        try {
+            // Map common property names to actual entity field names
+            String mappedSortBy = sortBy;
+            if ("eventName".equalsIgnoreCase(sortBy)) {
+                mappedSortBy = "event_name";
+            } else if ("totalSpots".equalsIgnoreCase(sortBy)) {
+                mappedSortBy = "total_spots";
+            } else if ("venueId".equalsIgnoreCase(sortBy)) {
+                mappedSortBy = "venue_id";
+            }
+            
+            Sort sort = ascending ? Sort.by(mappedSortBy).ascending() : Sort.by(mappedSortBy).descending();
+            Pageable pageable = PageRequest.of(page, size, sort);
+            return eventService.filterByDate(start, end, pageable);
+        } catch (Exception e) {
+            // Fallback to default sorting if there's an issue with the provided sortBy parameter
+            Sort sort = Sort.by("id").ascending();
+            Pageable pageable = PageRequest.of(page, size, sort);
+            return eventService.filterByDate(start, end, pageable);
+        }
     }
 
     // Adds Support for pagination below
@@ -79,9 +96,26 @@ public class EventController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "true") boolean ascending) {
 
-        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-        return eventService.findAll(pageable);
+        try {
+            // Map common property names to actual entity field names
+            String mappedSortBy = sortBy;
+            if ("eventName".equalsIgnoreCase(sortBy)) {
+                mappedSortBy = "event_name";
+            } else if ("totalSpots".equalsIgnoreCase(sortBy)) {
+                mappedSortBy = "total_spots";
+            } else if ("venueId".equalsIgnoreCase(sortBy)) {
+                mappedSortBy = "venue_id";
+            }
+            
+            Sort sort = ascending ? Sort.by(mappedSortBy).ascending() : Sort.by(mappedSortBy).descending();
+            Pageable pageable = PageRequest.of(page, size, sort);
+            return eventService.findAll(pageable);
+        } catch (Exception e) {
+            // Fallback to default sorting if there's an issue with the provided sortBy parameter
+            Sort sort = Sort.by("id").ascending();
+            Pageable pageable = PageRequest.of(page, size, sort);
+            return eventService.findAll(pageable);
+        }
     }
 
     @GetMapping("status/{status}") // .../api/events/1
@@ -93,9 +127,26 @@ public class EventController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "true") boolean ascending) {
 
-        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-        return eventService.findByStatus(pageable, status);
+        try {
+            // Map common property names to actual entity field names
+            String mappedSortBy = sortBy;
+            if ("eventName".equalsIgnoreCase(sortBy)) {
+                mappedSortBy = "event_name";
+            } else if ("totalSpots".equalsIgnoreCase(sortBy)) {
+                mappedSortBy = "total_spots";
+            } else if ("venueId".equalsIgnoreCase(sortBy)) {
+                mappedSortBy = "venue_id";
+            }
+            
+            Sort sort = ascending ? Sort.by(mappedSortBy).ascending() : Sort.by(mappedSortBy).descending();
+            Pageable pageable = PageRequest.of(page, size, sort);
+            return eventService.findByStatus(pageable, status);
+        } catch (Exception e) {
+            // Fallback to default sorting if there's an issue with the provided sortBy parameter
+            Sort sort = Sort.by("id").ascending();
+            Pageable pageable = PageRequest.of(page, size, sort);
+            return eventService.findByStatus(pageable, status);
+        }
     }
 
 }

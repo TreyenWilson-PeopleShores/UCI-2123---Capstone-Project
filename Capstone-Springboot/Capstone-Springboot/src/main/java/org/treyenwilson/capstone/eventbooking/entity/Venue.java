@@ -1,12 +1,6 @@
 package org.treyenwilson.capstone.eventbooking.entity;
 import jakarta.persistence.*;
-import org.hibernate.annotations.NotFound;
 import jakarta.validation.constraints.NotBlank;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-import javax.annotation.processing.Generated;
 
 @Entity
 @Table(name = "venues")
@@ -22,7 +16,7 @@ public class Venue {
     //getters and setters below
     public Venue(){}
 
-    public Venue(Long id, String venue_name, LocalDate date, String location, Long total_capacity, Long venue_id){
+    public Venue(Long id, String venue_name, String location, Long total_capacity){
         this.id = id;
         this.location = location;
         this.total_capacity = total_capacity;

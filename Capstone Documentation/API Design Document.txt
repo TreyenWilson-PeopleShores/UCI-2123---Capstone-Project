@@ -36,3 +36,137 @@ PUT http://localhost:8080/api/events/id/1044/cancelled
 - Intended for administrative actions (e.g. cancelling an event)
 - Event date and venue are intentionally immutable to preserve historical - accuracy
 - Events are not deleted; cancelled events remain available for reporting and auditing
+
+
+
+
+========
+Below are the API endpoints for Venue
+
+Got it 👍 — thanks for calling that out.  
+Below is the **Venue section rewritten to EXACTLY match the style of your existing API Design Document**, with **full URLs everywhere**, no shorthand paths, and **only features you’ve confirmed are working**.
+
+You can **copy‑paste this directly** into `API Design Document.txt` under the Events section.
+
+***
+
+# **Venues API Endpoints**
+
+***
+
+### Get a venue by ID (no pagination)
+
+    GET http://localhost:8080/api/venues/id/{id}
+
+**Description**
+
+*   Returns a single venue by its ID
+*   Returns **200 OK** if the venue exists
+*   Returns **404 Not Found** if the venue does not exist
+
+**Example**
+
+    http://localhost:8080/api/venues/id/4
+
+***
+
+### Get all venues (pagination supported)
+
+    GET http://localhost:8080/api/venues
+
+**Query Parameters**
+
+*   `page` (default: `0`)
+*   `size` (default: `10`)
+*   `sortBy` (default: `id`)
+*   `ascending` (default: `true`)
+
+**Important Note**
+
+*   The `sortBy` parameter must match a **Venue entity field name**, not a database column name.
+*   Valid examples include:
+    *   `venueName`
+    *   `location`
+    *   `totalCapacity`
+
+**Example**
+
+    http://localhost:8080/api/venues?page=0&size=5&sortBy=venue_name
+
+***
+
+### Get venues by location (pagination supported)
+
+    GET http://localhost:8080/api/venues/location/{location}
+
+**Description**
+
+*   Returns venues filtered by location
+*   Results are paginated and sortable
+
+**Example**
+
+    http://localhost:8080/api/venues/location/Columbus?page=0&size=5
+
+***
+
+### Create a new venue
+
+    POST http://localhost:8080/api/venues
+
+**Description**
+
+*   Creates a new venue
+*   Input is validated
+*   Venue ID is generated automatically
+*   Returns the created venue with **HTTP 201 (Created)**
+
+**Example Request Body**
+
+```json
+{
+  "venue_name": "Nationwide Arena",
+  "location": "Columbus, OH",
+  "total_capacity": 20000
+}
+```
+
+***
+
+### Update venue location (location‑only modification)
+
+    PUT http://localhost:8080/api/venues/id/{id}/{location}
+
+**Description**
+
+*   Updates **only** the venue location
+*   Intended for administrative corrections
+*   Other venue fields remain unchanged
+*   Returns **200 OK**
+
+**Example**
+
+    http://localhost:8080/api/venues/id/4/Cleveland, OH
+
+***
+
+### Venue Response Example
+
+```json
+{
+  "id": 4,
+  "venue_name": "Riverfront Pavilion",
+  "location": "Cincinnati, OH",
+  "total_capacity": 12000
+}
+```
+
+***
+
+## ✅ Current Scope Notes (Intentional)
+
+*   Venues are **created, retrieved, updated (location only)**.
+*   No DELETE endpoint is provided.
+*   Pagination is supported on list endpoints.
+*   Sorting is supported using **entity field names**.
+*   Additional filters (e.g. city/state query parameters) are **planned for future enhancement** but are not yet implemented.
