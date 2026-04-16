@@ -164,6 +164,21 @@ body {
   padding: 2px 5px;
 }
 
+.event-chip-scheduled {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.event-chip-completed {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.event-chip-cancelled {
+  background: #fef3c7;
+  color: #92400e;
+}
+
 .event-dot {
   position: absolute;
   bottom: 10px;
@@ -172,6 +187,18 @@ body {
   height: 9px;
   border-radius: 50%;
   background: #2563eb;
+}
+
+.event-dot-scheduled {
+  background: #166534;
+}
+
+.event-dot-completed {
+  background: #1d4ed8;
+}
+
+.event-dot-cancelled {
+  background: #92400e;
 }
 
 .calendar-summary {

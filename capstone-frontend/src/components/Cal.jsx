@@ -175,15 +175,27 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
               </div>
               
               <div className="day-events">
-                {day.events.slice(0, 3).map((event, eventIndex) => (
-                  <div 
-                    key={eventIndex}
-                    className="event-chip"
-                    title={event.title}
-                  >
-                    {event.title.length > 15 ? event.title.substring(0, 12) + '...' : event.title}
-                  </div>
-                ))}
+                {day.events.slice(0, 3).map((event, eventIndex) => {
+                  // Determine event status class
+                  let eventClass = "event-chip";
+                  if (event.status === "SCHEDULED") {
+                    eventClass += " event-chip-scheduled";
+                  } else if (event.status === "COMPLETED") {
+                    eventClass += " event-chip-completed";
+                  } else if (event.status === "CANCELLED") {
+                    eventClass += " event-chip-cancelled";
+                  }
+                  
+                  return (
+                    <div 
+                      key={eventIndex}
+                      className={eventClass}
+                      title={event.title}
+                    >
+                      {event.title.length > 15 ? event.title.substring(0, 12) + '...' : event.title}
+                    </div>
+                  );
+                })}
                 
                 {day.events.length > 3 && (
                   <div 
@@ -196,7 +208,7 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
               </div>
               
               {day.events.length > 0 && (
-                <div className="event-dot" />
+                <div className={`event-dot ${day.events[0].status === "SCHEDULED" ? "event-dot-scheduled" : day.events[0].status === "COMPLETED" ? "event-dot-completed" : "event-dot-cancelled"}`} />
               )}
             </div>
           ))}
