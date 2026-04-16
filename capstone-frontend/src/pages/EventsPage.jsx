@@ -1,76 +1,102 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Cal from '../components/Cal';
 
 function EventsPage() {
-  // State to store the events data
+  // State to store the events data for current month
   const [events, setEvents] = useState([]);
   // State to track loading status
   const [loading, setLoading] = useState(true);
   // State to track any errors
   const [error, setError] = useState(null);
+  // State to track current month (for fetching events by month)
+  const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  // useEffect hook to fetch data when component mounts
-  useEffect(() => {
-    // Define async function inside useEffect
-    const fetchEvents = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  // Function to get first and last day of a month
+  const getMonthRange = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    
+    // First day of the month
+    const firstDay = new Date(year, month, 1);
+    // Last day of the month
+    const lastDay = new Date(year, month + 1, 0);
+    
+    // Format as YYYY-MM-DD
+    const formatDate = (d) => {
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+    
+    return {
+      start: formatDate(firstDay),
+      end: formatDate(lastDay)
+    };
+  };
+
+  // Function to fetch all events for a month with pagination
+  const fetchEventsForMonth = useCallback(async (date) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const { start, end } = getMonthRange(date);
+      console.log(`Fetching events for ${start} to ${end}`);
+      
+      let allEvents = [];
+      let page = 0;
+      let hasMorePages = true;
+      
+      // Fetch all pages for the month
+      while (hasMorePages) {
+        const url = `/api/events/date?start=${start}&end=${end}&page=${page}`;
+        console.log(`Fetching page ${page}: ${url}`);
         
-        // Make API call to backend with headers to accept JSON
-        const response = await fetch('/api/events', {
+        const response = await fetch(url, {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
           },
         });
         
-        // Log response for debugging
-        console.log('Response status:', response.status, response.statusText);
-        
-        // Check if response is ok
         if (!response.ok) {
-          // Try to get error text for better debugging
           const errorText = await response.text();
           console.error('Error response:', errorText);
           throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
         }
         
-        // Parse JSON response
         const responseData = await response.json();
-        console.log('API Response:', responseData);
+        console.log(`Page ${page} response:`, responseData);
         
-        // Handle paginated response structure
-        // The API returns { content: [...] } according to the document
-        const eventsData = responseData.content || responseData;
+        // Add events from this page
+        if (responseData.content && Array.isArray(responseData.content)) {
+          allEvents = [...allEvents, ...responseData.content];
+        }
         
-        // Update state with fetched events
-        setEvents(Array.isArray(eventsData) ? eventsData : []);
-      } catch (err) {
-        // Handle any errors
-        setError(err.message || 'Failed to fetch events');
-        console.error('Error fetching events:', err);
-      } finally {
-        // Always set loading to false when done
-        setLoading(false);
+        // Check if there are more pages
+        hasMorePages = !responseData.last && page < responseData.totalPages - 1;
+        page++;
       }
-    };
-
-    // Call the async function
-    fetchEvents();
-    
-    // Empty dependency array means this effect runs once on mount
+      
+      console.log(`Total events for month: ${allEvents.length}`);
+      setEvents(allEvents);
+    } catch (err) {
+      setError(err.message || 'Failed to fetch events');
+      console.error('Error fetching events:', err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  // Render loading state
-  if (loading) {
-    return (
-      <div className="events-page">
-        <h1>Events</h1>
-        <div className="loading">Loading events...</div>
-      </div>
-    );
-  }
+  // Fetch events when currentMonth changes
+  useEffect(() => {
+    fetchEventsForMonth(currentMonth);
+  }, [currentMonth, fetchEventsForMonth]);
+
+  // Function to handle month change from calendar
+  const handleMonthChange = useCallback((newDate) => {
+    setCurrentMonth(newDate);
+  }, []);
+
+  // Don't hide the entire page during loading - show loading state inline
 
   // Render error state
   if (error) {
@@ -83,15 +109,16 @@ function EventsPage() {
           <ul>
             <li>Backend is running on http://localhost:8080</li>
             <li>CORS is configured on the backend</li>
-            <li>The endpoint /api/events exists</li>
+            <li>The endpoint /api/events/date exists</li>
           </ul>
         </div>
         <button onClick={() => window.location.reload()}>Retry</button>
         <button onClick={() => {
           setLoading(true);
           setError(null);
-          // Re-fetch events
-          fetch('/api/events')
+          // Re-fetch events for current month
+          const { start, end } = getMonthRange(currentMonth);
+          fetch(`/api/events/date?start=${start}&end=${end}&page=0`)
             .then(res => {
               console.log('Manual fetch status:', res.status);
               return res.text();
@@ -111,14 +138,21 @@ function EventsPage() {
     );
   }
 
+  // Get current month name for display
+  const currentMonthName = currentMonth.toLocaleString('default', { month: 'long' });
+  const currentYear = currentMonth.getFullYear();
+
   // Render main content with events
   return (
     <div className="events-page">
       <h1>Events</h1>
-      <p>Total events: {events.length}</p>
+      <p>
+        Showing events for {currentMonthName} {currentYear}: {events.length} event{events.length !== 1 ? 's' : ''}
+        {loading && ' (loading...)'}
+      </p>
       
-      {/* Pass events data to Cal component as props */}
-      <Cal events={events} />
+      {/* Pass events data, loading state, current month, and month change callback to Cal component */}
+      <Cal events={events} loading={loading} currentMonth={currentMonth} onMonthChange={handleMonthChange} />
     </div>
   );
 }
