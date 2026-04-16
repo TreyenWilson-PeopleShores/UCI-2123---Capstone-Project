@@ -257,3 +257,69 @@ Notes (Tickets):
 *   Tickets may be deleted via an administrative endpoint.
 
 ***
+
+
+
+
+Users API Endpoints
+Get a user by ID (no pagination):
+http://localhost:8080/api/users/id/{id}
+Description:
+
+Returns a single user by their unique ID
+Returns 200 OK if the user exists
+Returns 404 Not Found if the user does not exist
+
+Example:
+http://localhost:8080/api/users/id/1
+
+Get all users (pagination supported):
+http://localhost:8080/api/users
+Query parameters (all optional):
+page (default: 0)
+size (default: 10)
+sortBy (default: id)
+ascending (default: true)
+Description:
+
+Returns a paginated list of users
+Sorting is supported using Java entity field names
+Valid sortBy values include id, username, and role
+Invalid sortBy values fall back to sorting by id
+
+Examples:
+http://localhost:8080/api/users?page=0&size=10
+http://localhost:8080/api/users?page=0&size=10&sortBy=username&ascending=true
+http://localhost:8080/api/users?page=0&size=10&sortBy=role&ascending=true
+http://localhost:8080/api/users?page=0&size=10&sortBy=username&ascending=false
+
+Create a new user (registration):
+POST http://localhost:8080/api/users
+Description:
+
+Creates a new user account
+Request body is validated
+User ID is generated automatically
+Returns the created user with HTTP 201 (Created)
+
+Example request body:
+{
+"username": "admin",
+"password": "adminpass",
+"role": "ADMIN"
+}
+
+Error handling behavior (Users):
+
+Invalid request data returns HTTP 400 (Bad Request)
+Requesting a non‑existent user ID returns HTTP 404 (Not Found)
+Invalid sortBy parameters do not crash the API and fall back to default sorting
+
+
+Notes (Users):
+
+Users represent authenticated accounts in the system
+Roles are limited to USER and ADMIN
+User deletion is intentionally not supported to preserve historical integrity
+Users may be referenced by ticket purchase records
+Authentication and authorization will build on this user model
