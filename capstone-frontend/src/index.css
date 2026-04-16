@@ -1,0 +1,23 @@
+body{ /*Make this "div" instead of "body" to have h1 and span side by side, instead of
+  on top of one another.*/
+  padding-left: 2rem;
+  padding-right: 2rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  font-size: 1.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+h1{
+  display: flex;
+  justify-self: center;
+}
+
+span{
+  display: flex;
+  justify-self: center;
+}
