@@ -1,28 +1,15 @@
-import { useMemo, useState } from 'react';
-import EventModal from './EventModal';
+import { useMemo } from 'react';
 
-function Cal({ events = [], loading = false, currentMonth: currentDate = new Date(), onMonthChange, onStatusChange, onTicketPurchased }) {
-  // State for modal
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  
+function Cal({ events = [], loading = false, currentMonth: currentDate = new Date(), onMonthChange, onStatusChange, onTicketPurchased, onEventClick }) {
   // Event handlers
   const handleEventClick = (event) => {
-    setSelectedEvent(event);
-    setIsModalOpen(true);
-  };
-  
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedEvent(null);
-  };
-  
-  // Handle status change from modal
-  const handleStatusChange = (eventId, newStatus) => {
-    // Update local selectedEvent
-    if (selectedEvent && selectedEvent.id === eventId) {
-      setSelectedEvent({ ...selectedEvent, status: newStatus });
+    if (onEventClick) {
+      onEventClick(event);
     }
+  };
+  
+  // Handle status change from modal (called from parent)
+  const handleStatusChange = (eventId, newStatus) => {
     // Call parent callback to refetch or update events
     if (onStatusChange) {
       onStatusChange(eventId, newStatus);
@@ -282,14 +269,6 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
           {eventsInMonth} event{eventsInMonth !== 1 ? 's' : ''} in {monthNames[currentMonth]} {currentYear}
         </p>
       </div>
-      
-      <EventModal 
-        event={selectedEvent} 
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onStatusChange={handleStatusChange}
-        onTicketPurchased={onTicketPurchased}
-      />
     </section>
   );
 }

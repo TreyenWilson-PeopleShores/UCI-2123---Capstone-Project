@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Cal from '../components/Cal';
 import UpcomingEvents from '../components/UpcomingEvents';
+import EventModal from '../components/EventModal';
 
 function EventsPage() {
   // State to store the events data for current month
@@ -11,6 +12,9 @@ function EventsPage() {
   const [error, setError] = useState(null);
   // State to track current month (for fetching events by month)
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  // State for shared modal
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Function to get first and last day of a month
   const getMonthRange = (date) => {
@@ -116,6 +120,18 @@ function EventsPage() {
     fetchEventsForMonth(currentMonth);
   }, [currentMonth, fetchEventsForMonth]);
 
+  // Function to handle event click from any component (Calendar or UpcomingEvents)
+  const handleEventClick = useCallback((event) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  }, []);
+
+  // Function to close modal
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false);
+    setSelectedEvent(null);
+  }, []);
+
   // Don't hide the entire page during loading - show loading state inline
 
   // Render error state
@@ -171,15 +187,36 @@ function EventsPage() {
         {loading && ' (loading...)'}
       </p>
       
-      {/* Upcoming Events Section */}
-      <UpcomingEvents maxEvents={5} />
+      {/* Responsive Layout Container */}
+      <div className="events-layout">
+        {/* Upcoming Events Section - Sidebar on desktop, top on mobile */}
+        <div className="upcoming-events-container">
+          <UpcomingEvents 
+            maxEvents={5} 
+            onEventClick={handleEventClick}
+            events={events}
+          />
+        </div>
+        
+        {/* Calendar Section - Main content area */}
+        <div className="calendar-container">
+          <Cal 
+            events={events} 
+            loading={loading} 
+            currentMonth={currentMonth} 
+            onMonthChange={handleMonthChange}
+            onStatusChange={handleStatusChange}
+            onTicketPurchased={handleTicketPurchased}
+            onEventClick={handleEventClick}
+          />
+        </div>
+      </div>
       
-      {/* Pass events data, loading state, current month, month change callback, and status change callback to Cal component */}
-      <Cal 
-        events={events} 
-        loading={loading} 
-        currentMonth={currentMonth} 
-        onMonthChange={handleMonthChange}
+      {/* Shared Event Modal */}
+      <EventModal 
+        event={selectedEvent} 
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
         onStatusChange={handleStatusChange}
         onTicketPurchased={handleTicketPurchased}
       />

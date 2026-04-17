@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import StatusBadge from './StatusBadge';
 import '../styles/EventList.css';
 
 /**
@@ -9,19 +10,29 @@ import '../styles/EventList.css';
  * - event.date > today
  * 
  * Features:
- * - Fetches events from existing /api/events endpoint
+ * - Can use provided events prop or fetch its own data
  * - Client-side filtering and sorting
  * - Displays 3-5 upcoming events
  * - Generic styling for reuse with other event lists
+ * - Clickable events that trigger modal
  */
-const UpcomingEvents = ({ maxEvents = 5 }) => {
-  const [events, setEvents] = useState([]);
+const UpcomingEvents = ({ maxEvents = 5, onEventClick, events: providedEvents }) => {
+  const [internalEvents, setInternalEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch all events from the API
+  // Determine if we should use provided events or fetch our own
+  const shouldFetch = providedEvents === undefined;
+  const events = shouldFetch ? internalEvents : providedEvents;
+
+  // Fetch all events from the API (only if no events provided)
   useEffect(() => {
+    if (!shouldFetch) {
+      setLoading(false);
+      return;
+    }
+
     const fetchAllEvents = async () => {
       try {
         setLoading(true);
@@ -69,7 +80,7 @@ const UpcomingEvents = ({ maxEvents = 5 }) => {
           page++;
         }
         
-        setEvents(allEvents);
+        setInternalEvents(allEvents);
       } catch (err) {
         setError(err.message || 'Failed to fetch events');
         console.error('Error fetching events:', err);
@@ -79,7 +90,7 @@ const UpcomingEvents = ({ maxEvents = 5 }) => {
     };
 
     fetchAllEvents();
-  }, []);
+  }, [shouldFetch]);
 
   // Filter and sort events
   useEffect(() => {
@@ -181,7 +192,19 @@ const UpcomingEvents = ({ maxEvents = 5 }) => {
       <h2 className="event-list-title">Upcoming Events</h2>
       <div className="event-list">
         {filteredEvents.map(event => (
-          <div key={event.id} className="event-item">
+          <div 
+            key={event.id} 
+            className="event-item"
+            onClick={() => onEventClick && onEventClick(event)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onEventClick && onEventClick(event);
+              }
+            }}
+          >
             <div className="event-item-header">
               <h3 className="event-name">{event.name}</h3>
               <span className="event-date">{formatEventDate(event.date)}</span>
@@ -192,9 +215,7 @@ const UpcomingEvents = ({ maxEvents = 5 }) => {
                   {getVenueName(event.venue)}
                 </div>
               )}
-              <span className="event-status scheduled">
-                {event.status}
-              </span>
+              <StatusBadge status={event.status} size="sm" />
             </div>
           </div>
         ))}

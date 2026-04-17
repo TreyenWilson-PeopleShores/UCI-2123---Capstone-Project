@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import StatusBadge from './StatusBadge';
 
 function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased }) {
   const { currentUser, isAdmin } = useAuth();
@@ -100,12 +101,7 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased 
     }
   };
 
-  // Map status to display value
-  const statusDisplay = {
-    SCHEDULED: 'Scheduled',
-    COMPLETED: 'Completed',
-    CANCELLED: 'Cancelled'
-  };
+  
 
   // Handle status change (admin only)
   const handleStatusChange = async (e) => {
@@ -267,8 +263,29 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased 
   };
 
   if (!isOpen || !event) return null;
-
-  const statusLabel = statusDisplay[event.status] || event.status || 'Unknown';
+  
+  // Safely get event name with multiple fallbacks
+  const getEventName = () => {
+    return event.title || event.name || event.event_name || 'Event Details';
+  };
+  
+  // Safely get event name for display
+  const getEventDisplayName = () => {
+    return event.title || event.name || event.event_name || 'N/A';
+  };
+  
+  // Safely get venue name
+  const getVenueName = () => {
+    if (!event.venue) return 'N/A';
+    
+    if (typeof event.venue === 'string') return event.venue;
+    
+    if (typeof event.venue === 'object') {
+      return event.venue.venue_name || event.venue.name || event.venue.title || 'N/A';
+    }
+    
+    return 'N/A';
+  };
 
   return (
     <dialog 
@@ -279,7 +296,7 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased 
         {/* Header with close button */}
         <div className="modal-header">
           <h2 id="modal-title" className="modal-title">
-            {event.title || event.name || 'Event Details'}
+            {getEventName()}
           </h2>
           <button
             ref={closeButtonRef}
@@ -296,13 +313,19 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased 
           {/* Event Name */}
           <div className="modal-field">
             <label htmlFor="event-name" className="modal-label">Event Name</label>
-            <p id="event-name" className="modal-value">{event.title || event.name || 'N/A'}</p>
+            <p id="event-name" className="modal-value">{getEventDisplayName()}</p>
           </div>
 
           {/* Event Date */}
           <div className="modal-field">
             <label htmlFor="event-date" className="modal-label">Date</label>
             <p id="event-date" className="modal-value">{formatDate(event.date)}</p>
+          </div>
+
+          {/* Event Venue */}
+          <div className="modal-field">
+            <label htmlFor="event-venue" className="modal-label">Venue</label>
+            <p id="event-venue" className="modal-value">{getVenueName()}</p>
           </div>
 
           {/* Event Status - Role-based display */}
@@ -317,20 +340,16 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased 
                 value={selectedStatus}
                 onChange={handleStatusChange}
                 disabled={isUpdating}
-                aria-label={`Event status dropdown for ${event.title}`}
+                aria-label={`Event status dropdown for ${getEventName()}`}
               >
                 <option value="SCHEDULED">Scheduled</option>
                 <option value="COMPLETED">Completed</option>
                 <option value="CANCELLED">Cancelled</option>
               </select>
             ) : (
-              <p 
-                id="event-status"
-                className="modal-value"
-                aria-label={`Event status: ${statusLabel}`}
-              >
-                {statusLabel}
-              </p>
+              <div id="event-status" className="modal-value">
+                <StatusBadge status={event.status} size="md" />
+              </div>
             )}
           </div>
         </div>
@@ -344,7 +363,7 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased 
                 onClick={buyTicket}
                 type="button"
                 disabled={isPurchasing}
-                aria-label={`Purchase ticket for ${event.title}`}
+                aria-label={`Purchase ticket for ${getEventName()}`}
               >
                 {isPurchasing ? 'Purchasing...' : 'Buy Ticket'}
               </button>
@@ -368,7 +387,7 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased 
             className="modal-btn modal-btn-secondary"
             onClick={onClose}
             type="button"
-            aria-label={`Close event details for ${event.title}`}
+            aria-label={`Close event details for ${getEventName()}`}
           >
             Close
           </button>

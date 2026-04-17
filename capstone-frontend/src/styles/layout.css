@@ -50,3 +50,65 @@ main {
     font-size: 2rem;
   }
 }
+
+/* ===== EVENTS PAGE LAYOUT ===== */
+.events-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.events-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.upcoming-events-container {
+  width: 100%;
+}
+
+.calendar-container {
+  width: 100%;
+}
+
+/* Desktop layout: sidebar + main content */
+@media (min-width: 1024px) {
+  .events-layout {
+    flex-direction: row;
+    gap: 32px;
+    align-items: flex-start;
+  }
+  
+  .upcoming-events-container {
+    width: 320px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 24px;
+  }
+  
+  .calendar-container {
+    flex: 1;
+    min-width: 0; /* Allows calendar to shrink if needed */
+  }
+  
+  /* Adjust calendar width for sidebar layout */
+  .cal-component {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+}
+
+/* Tablet layout adjustments */
+@media (min-width: 769px) and (max-width: 1023px) {
+  .events-layout {
+    gap: 32px;
+  }
+  
+  .upcoming-events-container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}

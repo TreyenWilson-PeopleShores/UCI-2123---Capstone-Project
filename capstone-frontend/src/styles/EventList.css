@@ -37,6 +37,20 @@
   border-color: #3b82f6;
 }
 
+.event-item:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.event-item:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.event-item:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
 .event-item-header {
   display: flex;
   justify-content: space-between;
@@ -93,18 +107,18 @@
 
 /* Status-specific colors - can be overridden by parent components */
 .event-status.scheduled {
-  background-color: #dbeafe;
-  color: #1e40af;
-}
-
-.event-status.completed {
   background-color: #dcfce7;
   color: #166534;
 }
 
+.event-status.completed {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
 .event-status.cancelled {
-  background-color: #fee2e2;
-  color: #991b1b;
+  background-color: #fef3c7;
+  color: #92400e;
 }
 
 .event-empty-state {
