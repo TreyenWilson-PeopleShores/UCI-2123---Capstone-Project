@@ -63,7 +63,32 @@ function EventModal({ event, isOpen, onClose, onStatusChange }) {
   const formatDate = (dateValue) => {
     if (!dateValue) return 'Unknown date';
     try {
-      const date = new Date(dateValue);
+      // Parse date string manually to avoid timezone issues
+      // Expected format: YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss
+      const dateStr = String(dateValue);
+      const dateMatch = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      
+      if (!dateMatch) {
+        // Fallback to Date object if format doesn't match
+        const date = new Date(dateValue);
+        if (isNaN(date.getTime())) return 'Invalid date';
+        
+        return date.toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      }
+      
+      // Extract year, month, day from the string
+      const year = parseInt(dateMatch[1], 10);
+      const month = parseInt(dateMatch[2], 10) - 1; // Convert to 0-indexed
+      const day = parseInt(dateMatch[3], 10);
+      
+      // Create date object with local timezone (midnight)
+      const date = new Date(year, month, day);
+      
       return date.toLocaleDateString('en-US', {
         weekday: 'long',
         year: 'numeric',

@@ -46,13 +46,32 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
     if (!dateValue) return null;
     
     try {
-      const date = new Date(dateValue);
-      if (isNaN(date.getTime())) return null;
+      // Parse date string manually to avoid timezone issues
+      // Expected format: YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss
+      const dateStr = String(dateValue);
+      const dateMatch = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      
+      if (!dateMatch) {
+        // Fallback to Date object if format doesn't match
+        const date = new Date(dateValue);
+        if (isNaN(date.getTime())) return null;
+        
+        return {
+          year: date.getFullYear(),
+          month: date.getMonth(),
+          day: date.getDate()
+        };
+      }
+      
+      // Extract year, month, day from the string (month is 0-indexed in JavaScript)
+      const year = parseInt(dateMatch[1], 10);
+      const month = parseInt(dateMatch[2], 10) - 1; // Convert to 0-indexed
+      const day = parseInt(dateMatch[3], 10);
       
       return {
-        year: date.getFullYear(),
-        month: date.getMonth(),
-        day: date.getDate()
+        year,
+        month,
+        day
       };
     } catch (error) {
       console.error(error);
