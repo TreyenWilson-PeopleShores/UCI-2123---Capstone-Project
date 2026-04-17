@@ -137,14 +137,16 @@ function EventModal({ event, isOpen, onClose, isAdmin = false }) {
 
         {/* Footer with action button */}
         <div className="modal-footer">
-          <button 
-            className="modal-btn modal-btn-primary"
-            onClick={onClose}
-            type="button"
-            aria-label={`Purchase ticket for ${event.title}`}
-          >
-            Buy Ticket
-          </button>
+          {event.status === 'SCHEDULED' && (
+            <button 
+              className="modal-btn modal-btn-primary"
+              onClick={onClose}
+              type="button"
+              aria-label={`Purchase ticket for ${event.title}`}
+            >
+              Buy Ticket
+            </button>
+          )}
           <button 
             className="modal-btn modal-btn-secondary"
             onClick={onClose}
