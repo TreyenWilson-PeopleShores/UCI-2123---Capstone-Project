@@ -1,6 +1,25 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import EventModal from './EventModal';
 
 function Cal({ events = [], loading = false, currentMonth: currentDate = new Date(), onMonthChange }) {
+  // State for modal
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Mock admin state (can be connected to actual user context later)
+  const isAdmin = false;
+  
+  // Event handlers
+  const handleEventClick = (event) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  };
+  
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedEvent(null);
+  };
+  
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth();
   
@@ -194,14 +213,16 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
                   }
                   
                   return (
-                    <div 
+                    <button 
                       key={eventIndex}
                       className={eventClass}
                       title={`${statusText}${event.title}`}
-                      aria-label={`${statusText}${event.title}`}
+                      aria-label={`${statusText}${event.title}, click to view details`}
+                      onClick={() => handleEventClick(event)}
+                      type="button"
                     >
                       {event.title.length > 15 ? event.title.substring(0, 12) + '...' : event.title}
-                    </div>
+                    </button>
                   );
                 })}
                 
@@ -232,6 +253,13 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
           {eventsInMonth} event{eventsInMonth !== 1 ? 's' : ''} in {monthNames[currentMonth]} {currentYear}
         </p>
       </div>
+      
+      <EventModal 
+        event={selectedEvent} 
+        isOpen={isModalOpen} 
+        onClose={handleCloseModal}
+        isAdmin={isAdmin}
+      />
     </section>
   );
 }
