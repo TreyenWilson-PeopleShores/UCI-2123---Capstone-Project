@@ -97,6 +97,179 @@ body {
   height: 660px;
 }
 
+/* Mobile-first responsive styles */
+@media (max-width: 768px) {
+  .cal-component {
+    padding: 16px;
+    margin: 16px auto;
+    border-radius: 12px;
+    max-width: calc(100vw - 32px); /* Ensure it doesn't exceed viewport */
+    box-sizing: border-box;
+  }
+  
+  .cal-component h2 {
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+  }
+  
+  .calendar-navigation {
+    margin-bottom: 14px;
+    flex-wrap: nowrap; /* Keep buttons and month title on same line */
+  }
+  
+  .current-month {
+    font-size: 1.1rem;
+    text-align: center;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 8px;
+  }
+  
+  .nav-button {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    min-width: 44px; /* Minimum touch target size */
+    flex-shrink: 0; /* Prevent buttons from shrinking */
+  }
+  
+  .calendar-grid {
+    border-radius: 12px;
+    overflow-x: auto; /* Allow horizontal scrolling if needed */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+  
+  .calendar-header {
+    min-width: 100%; /* Use full width instead of fixed min-width */
+    grid-template-columns: repeat(7, minmax(0, 1fr)); /* Ensure equal columns */
+  }
+  
+  .day-header {
+    padding: 10px 4px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .calendar-days {
+    min-width: 100%; /* Use full width instead of fixed min-width */
+    grid-template-rows: repeat(6, 85px); /* Slightly reduce row height */
+    height: 510px; /* Adjust total height */
+    grid-template-columns: repeat(7, minmax(0, 1fr)); /* Ensure equal columns */
+  }
+  
+  .calendar-day {
+    padding: 6px 4px 4px;
+    gap: 4px;
+    min-height: 85px; /* Ensure consistent height */
+    overflow: hidden; /* Prevent content overflow */
+  }
+  
+  .day-number {
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  
+  .day-events {
+    gap: 3px;
+    overflow-y: auto; /* Allow vertical scrolling within day cell if needed */
+    max-height: 60px; /* Limit height to prevent overflow */
+  }
+  
+  .event-chip {
+    padding: 2px 4px;
+    font-size: 0.7rem;
+    min-height: 18px; /* Ensure consistent height */
+    display: flex;
+    align-items: center;
+  }
+  
+  .event-chip-more {
+    font-size: 0.65rem;
+    padding: 1px 3px;
+  }
+  
+  /* Hide event dots on mobile for cleaner UI */
+  .event-dot {
+    display: none;
+  }
+  
+  .calendar-summary {
+    margin-top: 14px;
+    padding-top: 10px;
+    font-size: 0.85rem;
+    text-align: center;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .calendar-days {
+    grid-template-rows: repeat(6, 100px);
+    height: 600px;
+  }
+  
+  .calendar-day {
+    padding: 10px 8px 8px;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .cal-component {
+    padding: 12px;
+    margin: 12px auto;
+  }
+  
+  .cal-component h2 {
+    font-size: 1.1rem;
+  }
+  
+  .current-month {
+    font-size: 1rem;
+  }
+  
+  .calendar-days {
+    grid-template-rows: repeat(6, 75px);
+    height: 450px;
+  }
+  
+  .calendar-day {
+    padding: 5px 3px 3px;
+    gap: 3px;
+    min-height: 75px;
+  }
+  
+  .day-number {
+    font-size: 0.8rem;
+  }
+  
+  .event-chip {
+    font-size: 0.6rem;
+    padding: 1px 2px;
+    min-height: 14px;
+    line-height: 1.1;
+  }
+  
+  .event-chip-more {
+    font-size: 0.55rem;
+    padding: 1px 2px;
+  }
+  
+  .day-events {
+    max-height: 50px;
+  }
+  
+  .nav-button {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+}
+
 .calendar-day {
   position: relative;
   padding: 12px 10px 10px;
@@ -207,5 +380,166 @@ body {
   border-top: 1px solid #e5e9f0;
   color: #4b5563;
   font-size: 0.95rem;
+}
+
+/* Ensure calendar fits within mobile viewport */
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden; /* Prevent horizontal scroll on body */
+  }
+  
+  .cal-component {
+    width: calc(100% - 24px); /* Account for padding */
+    margin-left: 12px;
+    margin-right: 12px;
+    max-width: 100%; /* Ensure it doesn't exceed viewport */
+    box-sizing: border-box;
+  }
+  
+  /* Improve calendar grid scrolling */
+  .calendar-grid {
+    overflow-x: auto; /* Allow horizontal scrolling only when absolutely necessary */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scrollbar-width: thin; /* Thin scrollbar for better UX */
+  }
+  
+  .calendar-grid::-webkit-scrollbar {
+    height: 4px; /* Thin scrollbar for mobile */
+  }
+  
+  .calendar-grid::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 2px;
+  }
+}
+
+/* Improve touch targets for mobile */
+@media (max-width: 768px) {
+  .calendar-day {
+    min-height: 80px; /* Ensure minimum touch area */
+  }
+  
+  .nav-button {
+    touch-action: manipulation; /* Improve touch responsiveness */
+  }
+}
+
+/* iPhone SE and very small screen optimizations */
+@media (max-width: 375px) {
+  .cal-component {
+    padding: 10px;
+    margin: 10px auto;
+    width: calc(100% - 20px);
+  }
+  
+  .cal-component h2 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+  
+  .calendar-navigation {
+    margin-bottom: 12px;
+    gap: 8px;
+  }
+  
+  .current-month {
+    font-size: 0.9rem;
+    padding: 0 4px;
+  }
+  
+  .nav-button {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    min-width: 40px;
+  }
+  
+  .calendar-days {
+    grid-template-rows: repeat(6, 70px);
+    height: 420px;
+  }
+  
+  .calendar-day {
+    padding: 4px 2px 2px;
+    gap: 2px;
+    min-height: 70px;
+  }
+  
+  .day-number {
+    font-size: 0.75rem;
+  }
+  
+  .day-header {
+    font-size: 0.6rem;
+    padding: 6px 1px;
+    letter-spacing: -0.02em; /* Slightly tighter letter spacing */
+  }
+  
+  .event-chip {
+    font-size: 0.5rem;
+    padding: 1px 2px;
+    min-height: 10px;
+    line-height: 1;
+  }
+  
+  .event-chip-more {
+    font-size: 0.45rem;
+    padding: 0 1px;
+  }
+  
+  .calendar-summary {
+    margin-top: 10px;
+    padding-top: 6px;
+    font-size: 0.75rem;
+  }
+}
+
+/* Extreme small screen fallback - single letter day headers */
+@media (max-width: 320px) {
+  .day-header {
+    font-size: 0.55rem;
+    padding: 5px 0;
+  }
+  
+  /* Optionally use single letters for day names on extremely small screens */
+  .day-header[aria-label=\"Sunday\"]::after,
+  .day-header[aria-label=\"Monday\"]::after,
+  .day-header[aria-label=\"Tuesday\"]::after,
+  .day-header[aria-label=\"Wednesday\"]::after,
+  .day-header[aria-label=\"Thursday\"]::after,
+  .day-header[aria-label=\"Friday\"]::after,
+  .day-header[aria-label=\"Saturday\"]::after {
+    content: attr(aria-label);
+    display: none; /* Hide full text */
+  }
+  
+  .day-header::before {
+    content: attr(aria-label);
+    font-size: 0.55rem;
+  }
+  
+  /* Map to single letters */
+  .day-header[aria-label=\"Sunday\"]::before { content: \"S\"; }
+  .day-header[aria-label=\"Monday\"]::before { content: \"M\"; }
+  .day-header[aria-label=\"Tuesday\"]::before { content: \"T\"; }
+  .day-header[aria-label=\"Wednesday\"]::before { content: \"W\"; }
+  .day-header[aria-label=\"Thursday\"]::before { content: \"T\"; }
+  .day-header[aria-label=\"Friday\"]::before { content: \"F\"; }
+  .day-header[aria-label=\"Saturday\"]::before { content: \"S\"; }
+}
+
+/* Prevent text overflow on very small screens */
+@media (max-width: 360px) {
+  .event-chip {
+    font-size: 0.6rem;
+  }
+  
+  .day-header {
+    font-size: 0.7rem;
+    padding: 8px 4px;
+  }
+  
+  .current-month {
+    font-size: 0.95rem;
+  }
 }
 
