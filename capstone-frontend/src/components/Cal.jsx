@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import EventModal from './EventModal';
 
-function Cal({ events = [], loading = false, currentMonth: currentDate = new Date(), onMonthChange, onStatusChange }) {
+function Cal({ events = [], loading = false, currentMonth: currentDate = new Date(), onMonthChange, onStatusChange, onTicketPurchased }) {
   // State for modal
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -288,6 +288,7 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onStatusChange={handleStatusChange}
+        onTicketPurchased={onTicketPurchased}
       />
     </section>
   );

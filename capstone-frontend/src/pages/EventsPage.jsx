@@ -108,6 +108,13 @@ function EventsPage() {
     // fetchEventsForMonth(currentMonth);
   }, []);
 
+  // Function to handle ticket purchase from modal
+  const handleTicketPurchased = useCallback((eventId) => {
+    console.log(`Ticket purchased for event ${eventId}, refreshing events...`);
+    // Refresh events for the current month to get updated ticket counts
+    fetchEventsForMonth(currentMonth);
+  }, [currentMonth, fetchEventsForMonth]);
+
   // Don't hide the entire page during loading - show loading state inline
 
   // Render error state
@@ -170,6 +177,7 @@ function EventsPage() {
         currentMonth={currentMonth} 
         onMonthChange={handleMonthChange}
         onStatusChange={handleStatusChange}
+        onTicketPurchased={handleTicketPurchased}
       />
     </div>
   );

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
-function EventModal({ event, isOpen, onClose, onStatusChange }) {
+function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased }) {
   const { currentUser, isAdmin } = useAuth();
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
@@ -183,7 +183,8 @@ function EventModal({ event, isOpen, onClose, onStatusChange }) {
       }
       
       const ticketData = await ticketResponse.json();
-      const tickets = ticketData.content || [];
+      // Handle both response formats: content array or direct array
+      const tickets = Array.isArray(ticketData) ? ticketData : (ticketData.content || []);
       
       if (tickets.length === 0) {
         throw new Error('No tickets found for this event');
@@ -251,6 +252,11 @@ function EventModal({ event, isOpen, onClose, onStatusChange }) {
       // Success!
       setPurchaseMessage('Ticket purchased successfully!');
       console.log('Ticket purchase completed successfully');
+      
+      // Notify parent about successful purchase
+      if (onTicketPurchased && event.id) {
+        onTicketPurchased(event.id);
+      }
       
     } catch (error) {
       console.error('Ticket purchase failed:', error);
