@@ -92,6 +92,34 @@ const UpcomingEvents = ({ maxEvents = 5, onEventClick, events: providedEvents })
     fetchAllEvents();
   }, [shouldFetch]);
 
+  // Helper function to parse date without timezone issues
+  const parseDate = (dateValue) => {
+    if (!dateValue) return null;
+    
+    try {
+      // Parse date string manually to avoid timezone issues
+      // Expected format: YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss
+      const dateStr = String(dateValue);
+      const dateMatch = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      
+      if (!dateMatch) {
+        // Fallback to Date object if format doesn't match
+        const date = new Date(dateValue);
+        return isNaN(date.getTime()) ? null : date;
+      }
+      
+      // Extract year, month, day from the string
+      const year = parseInt(dateMatch[1], 10);
+      const month = parseInt(dateMatch[2], 10) - 1; // Convert to 0-indexed
+      const day = parseInt(dateMatch[3], 10);
+      
+      // Create date object with local timezone (midnight)
+      return new Date(year, month, day);
+    } catch {
+      return null;
+    }
+  };
+
   // Filter and sort events
   useEffect(() => {
     if (events.length === 0) {
@@ -108,12 +136,18 @@ const UpcomingEvents = ({ maxEvents = 5, onEventClick, events: providedEvents })
         if (event.status !== 'SCHEDULED') return false;
         
         // Filter for future dates
-        const eventDate = new Date(event.date);
+        const eventDate = parseDate(event.date);
+        if (!eventDate) return false;
+        
         return eventDate > today;
       })
       .sort((a, b) => {
         // Sort by date ascending (soonest first)
-        return new Date(a.date) - new Date(b.date);
+        const dateA = parseDate(a.date);
+        const dateB = parseDate(b.date);
+        
+        if (!dateA || !dateB) return 0;
+        return dateA - dateB;
       })
       .slice(0, maxEvents); // Limit to maxEvents
 
@@ -121,22 +155,16 @@ const UpcomingEvents = ({ maxEvents = 5, onEventClick, events: providedEvents })
   }, [events, maxEvents]);
 
   // Format date to readable string with error handling
-  const formatEventDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) {
-        return 'Invalid date';
-      }
-      return date.toLocaleDateString('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
-      });
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return 'Date error';
-    }
+  const formatEventDate = (dateValue) => {
+    const date = parseDate(dateValue);
+    if (!date) return 'Unknown date';
+    
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
   };
 
   // Safely extract venue name from venue object
