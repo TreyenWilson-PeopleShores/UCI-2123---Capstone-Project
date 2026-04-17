@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import Cal from '../components/Cal';
+import UpcomingEvents from '../components/UpcomingEvents';
 
 function EventsPage() {
   // State to store the events data for current month
@@ -169,6 +170,9 @@ function EventsPage() {
         Showing events for {currentMonthName} {currentYear}: {events.length} event{events.length !== 1 ? 's' : ''}
         {loading && ' (loading...)'}
       </p>
+      
+      {/* Upcoming Events Section */}
+      <UpcomingEvents maxEvents={5} />
       
       {/* Pass events data, loading state, current month, month change callback, and status change callback to Cal component */}
       <Cal 
