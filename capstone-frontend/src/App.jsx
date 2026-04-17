@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import EventsPage from './pages/EventsPage';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import LoginIcon from './components/LoginIcon';
 import { AuthProvider } from './contexts/AuthContext';
 
@@ -18,6 +19,7 @@ function App() {
             
             <Route path="/" element={<EventsPage />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
           </Routes>
         </main>
       </div>
