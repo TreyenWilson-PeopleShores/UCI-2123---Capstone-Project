@@ -127,20 +127,20 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
   }).length;
   
   return (
-    <div className="cal-component">
+    <section className="cal-component" aria-label="Event calendar">
       <h2>Event Calendar</h2>
       
-      <div className="calendar-navigation">
+      <div className="calendar-navigation" role="navigation" aria-label="Calendar navigation">
         <button 
           className="nav-button"
           onClick={goToPreviousMonth}
-          aria-label="Previous month"
+          aria-label={`Go to previous month, ${monthNames[currentMonth === 0 ? 11 : currentMonth - 1]} ${currentMonth === 0 ? currentYear - 1 : currentYear}`}
           disabled={loading}
         >
           &larr;
         </button>
         
-        <h3 className="current-month">
+        <h3 className="current-month" id="current-month-heading">
           {monthNames[currentMonth]} {currentYear}
           {loading && ' (loading...)'}
         </h3>
@@ -148,27 +148,30 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
         <button 
           className="nav-button"
           onClick={goToNextMonth}
-          aria-label="Next month"
+          aria-label={`Go to next month, ${monthNames[currentMonth === 11 ? 0 : currentMonth + 1]} ${currentMonth === 11 ? currentYear + 1 : currentYear}`}
           disabled={loading}
         >
           &rarr;
         </button>
       </div>
       
-      <div className="calendar-grid">
-        <div className="calendar-header">
+      <div className="calendar-grid" role="grid" aria-labelledby="current-month-heading" aria-readonly="true">
+        <div className="calendar-header" role="row">
           {dayNames.map(day => (
-            <div key={day} className="day-header">
+            <div key={day} className="day-header" role="columnheader" aria-label={day}>
               {day}
             </div>
           ))}
         </div>
         
-        <div className="calendar-days">
+        <div className="calendar-days" role="rowgroup">
           {calendarDays.map((day, index) => (
             <div 
               key={index}
               className={`calendar-day ${day.isCurrentMonth ? 'current-month' : 'other-month'} ${day.isToday ? 'today' : ''}`}
+              role="gridcell"
+              aria-label={day.isCurrentMonth ? `Day ${day.dayNumber} of ${monthNames[currentMonth]} ${currentYear}` : 'Empty day'}
+              aria-selected={day.isToday ? 'true' : 'false'}
             >
               <div className="day-number">
                 {day.isCurrentMonth ? day.dayNumber : ''}
@@ -178,19 +181,24 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
                 {day.events.slice(0, 3).map((event, eventIndex) => {
                   // Determine event status class
                   let eventClass = "event-chip";
+                  let statusText = "";
                   if (event.status === "SCHEDULED") {
                     eventClass += " event-chip-scheduled";
+                    statusText = "Scheduled event: ";
                   } else if (event.status === "COMPLETED") {
                     eventClass += " event-chip-completed";
+                    statusText = "Completed event: ";
                   } else if (event.status === "CANCELLED") {
                     eventClass += " event-chip-cancelled";
+                    statusText = "Cancelled event: ";
                   }
                   
                   return (
                     <div 
                       key={eventIndex}
                       className={eventClass}
-                      title={event.title}
+                      title={`${statusText}${event.title}`}
+                      aria-label={`${statusText}${event.title}`}
                     >
                       {event.title.length > 15 ? event.title.substring(0, 12) + '...' : event.title}
                     </div>
@@ -201,6 +209,7 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
                   <div 
                     className="event-chip event-chip-more"
                     title={`${day.events.length - 3} more events`}
+                    aria-label={`${day.events.length - 3} more events on day ${day.dayNumber}`}
                   >
                     +{day.events.length - 3}
                   </div>
@@ -208,19 +217,22 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
               </div>
               
               {day.events.length > 0 && (
-                <div className={`event-dot ${day.events[0].status === "SCHEDULED" ? "event-dot-scheduled" : day.events[0].status === "COMPLETED" ? "event-dot-completed" : "event-dot-cancelled"}`} />
+                <div 
+                  className={`event-dot ${day.events[0].status === "SCHEDULED" ? "event-dot-scheduled" : day.events[0].status === "COMPLETED" ? "event-dot-completed" : "event-dot-cancelled"}`}
+                  aria-label={`Event status indicator: ${day.events[0].status}`}
+                />
               )}
             </div>
           ))}
         </div>
       </div>
       
-      <div className="calendar-summary">
+      <div className="calendar-summary" role="status" aria-live="polite">
         <p>
           {eventsInMonth} event{eventsInMonth !== 1 ? 's' : ''} in {monthNames[currentMonth]} {currentYear}
         </p>
       </div>
-    </div>
+    </section>
   );
 }
 
