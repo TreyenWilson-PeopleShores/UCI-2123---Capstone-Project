@@ -1,13 +1,10 @@
 import { useMemo, useState } from 'react';
 import EventModal from './EventModal';
 
-function Cal({ events = [], loading = false, currentMonth: currentDate = new Date(), onMonthChange }) {
+function Cal({ events = [], loading = false, currentMonth: currentDate = new Date(), onMonthChange, onStatusChange }) {
   // State for modal
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  // Mock admin state (can be connected to actual user context later)
-  const isAdmin = false;
   
   // Event handlers
   const handleEventClick = (event) => {
@@ -18,6 +15,18 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedEvent(null);
+  };
+  
+  // Handle status change from modal
+  const handleStatusChange = (eventId, newStatus) => {
+    // Update local selectedEvent
+    if (selectedEvent && selectedEvent.id === eventId) {
+      setSelectedEvent({ ...selectedEvent, status: newStatus });
+    }
+    // Call parent callback to refetch or update events
+    if (onStatusChange) {
+      onStatusChange(eventId, newStatus);
+    }
   };
   
   const currentYear = currentDate.getFullYear();
@@ -46,6 +55,7 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
         day: date.getDate()
       };
     } catch (error) {
+      console.error(error);
       return null;
     }
   };
@@ -256,9 +266,9 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
       
       <EventModal 
         event={selectedEvent} 
-        isOpen={isModalOpen} 
+        isOpen={isModalOpen}
         onClose={handleCloseModal}
-        isAdmin={isAdmin}
+        onStatusChange={handleStatusChange}
       />
     </section>
   );

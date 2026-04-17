@@ -96,6 +96,18 @@ function EventsPage() {
     setCurrentMonth(newDate);
   }, []);
 
+  // Function to handle status change from modal (admin status update)
+  const handleStatusChange = useCallback((eventId, newStatus) => {
+    // Update the events list with the new status
+    setEvents(prevEvents => 
+      prevEvents.map(event => 
+        event.id === eventId ? { ...event, status: newStatus } : event
+      )
+    );
+    // Optionally, refetch all events to ensure consistency
+    // fetchEventsForMonth(currentMonth);
+  }, []);
+
   // Don't hide the entire page during loading - show loading state inline
 
   // Render error state
@@ -151,8 +163,14 @@ function EventsPage() {
         {loading && ' (loading...)'}
       </p>
       
-      {/* Pass events data, loading state, current month, and month change callback to Cal component */}
-      <Cal events={events} loading={loading} currentMonth={currentMonth} onMonthChange={handleMonthChange} />
+      {/* Pass events data, loading state, current month, month change callback, and status change callback to Cal component */}
+      <Cal 
+        events={events} 
+        loading={loading} 
+        currentMonth={currentMonth} 
+        onMonthChange={handleMonthChange}
+        onStatusChange={handleStatusChange}
+      />
     </div>
   );
 }
