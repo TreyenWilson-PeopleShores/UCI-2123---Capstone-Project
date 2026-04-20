@@ -22,10 +22,13 @@ NOTE: Springboot and the backend uses java "corretto-21" (Amazon Corretto 21.0.1
 
 Pagination was implemented using Spring Data JPA’s Pageable and Page<T> abstractions, based on official documentation and online examples, and adapted to the project’s event domain.
 
-M365 Copilot was used to help create the project proposal.
+M365 Copilot was 
+=== SETUP after git cloning ===
+To make it so the front end runs, first cd to "capstone-frontend" folder inside of the GitHub repository.
+then run "npm install".
+Once its' finished installing run "npm run dev" in the same folder to have the front end start.
 
-=== PROTOTYPE SETUP - BY M365 COPILOT ===
-
+=========
 Frontend Setup (React + NPM Follow‑Along)
 This section documents the steps used to initialize and prepare the React frontend for the capstone project.
 Prerequisites
@@ -37,14 +40,17 @@ NPM available from the command line
 Step 1: Create React Application Using Vite
 The React application was scaffolded using Vite, a modern frontend build tool.
 From the project directory, run:
-Shellnpm create vite@latest practice-capstone-frontendShow more lines
+Shell: npm create vite@latest practice-capstone-frontend
 When prompted, select:
 
 Framework: React
 Variant: JavaScript
 
 After creation, navigate into the project and install dependencies:
-Shellcd practice-capstone-frontendnpm installnpm run devShow more lines
+cd practice-capstone-frontend
+npm install
+npm run dev
+
 This starts the development server and confirms the React environment is working.
 
 Step 2: Clean Default Boilerplate
