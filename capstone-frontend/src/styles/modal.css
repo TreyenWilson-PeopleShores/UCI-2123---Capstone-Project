@@ -288,3 +288,20 @@
     padding: 8px 16px;
   }
 }
+
+/* Ticket Price Styles */
+.ticket-price {
+  font-weight: 600;
+  color: #059669; /* Green color for price */
+  font-size: 1.1rem;
+}
+
+.ticket-price-loading {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.ticket-price-error {
+  color: #dc2626; /* Red color for error */
+  font-size: 0.9rem;
+}

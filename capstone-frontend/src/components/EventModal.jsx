@@ -11,12 +11,65 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased 
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [purchaseMessage, setPurchaseMessage] = useState('');
   const [purchaseError, setPurchaseError] = useState('');
+  const [ticketPrice, setTicketPrice] = useState(null);
+  const [ticketLoading, setTicketLoading] = useState(false);
+  const [ticketError, setTicketError] = useState('');
 
   // Update selectedStatus when event changes
   useEffect(() => {
     if (event) {
       setSelectedStatus(event.status);
     }
+  }, [event]);
+
+  // Fetch ticket price when event changes
+  useEffect(() => {
+    const fetchTicketPrice = async () => {
+      if (!event || !event.id) {
+        setTicketPrice(null);
+        return;
+      }
+
+      setTicketLoading(true);
+      setTicketError('');
+      
+      try {
+        // Fetch ticket for the event
+        const response = await fetch(
+          `/api/tickets/event/${event.id}?page=0&size=1&sortBy=id&ascending=true`,
+          {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ticket: ${response.statusText}`);
+        }
+        
+        const ticketData = await response.json();
+        // Handle both response formats: content array or direct array
+        const tickets = Array.isArray(ticketData) ? ticketData : (ticketData.content || []);
+        
+        if (tickets.length === 0) {
+          setTicketPrice(null);
+          setTicketError('No ticket information available');
+        } else {
+          const ticket = tickets[0];
+          setTicketPrice(ticket.price);
+        }
+      } catch (error) {
+        console.error('Error fetching ticket price:', error);
+        setTicketError('Failed to load ticket price');
+        setTicketPrice(null);
+      } finally {
+        setTicketLoading(false);
+      }
+    };
+
+    fetchTicketPrice();
   }, [event]);
 
   // Handle Esc key press and focus management
@@ -99,6 +152,19 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased 
     } catch {
       return 'Invalid date';
     }
+  };
+
+  // Format price as currency
+  const formatPrice = (price) => {
+    if (price === null || price === undefined) return 'N/A';
+    
+    // Format as USD currency
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(price);
   };
 
   
@@ -351,6 +417,22 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased 
                 <StatusBadge status={event.status} size="md" />
               </div>
             )}
+          </div>
+
+          {/* Ticket Price */}
+          <div className="modal-field">
+            <label htmlFor="ticket-price" className="modal-label">
+              Ticket Price
+            </label>
+            <div id="ticket-price" className="modal-value">
+              {ticketLoading ? (
+                <span className="ticket-price-loading">Loading price...</span>
+              ) : ticketError ? (
+                <span className="ticket-price-error">{ticketError}</span>
+              ) : (
+                <span className="ticket-price">{formatPrice(ticketPrice)}</span>
+              )}
+            </div>
           </div>
         </div>
 
