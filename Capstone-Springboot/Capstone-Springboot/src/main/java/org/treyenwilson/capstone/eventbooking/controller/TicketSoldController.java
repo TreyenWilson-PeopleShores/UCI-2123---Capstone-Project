@@ -79,4 +79,36 @@ public class TicketSoldController {
             return ticketSoldService.findAll(pageable);
         }
     }
+
+    @GetMapping("/user/{userId}")
+    // Example call: http://localhost:8080/api/tickets-sold/user/3?page=0&size=10&sortBy=dateSold&ascending=true
+    public Page<TicketSold> getTicketsSoldByUserId(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "true") boolean ascending) {
+
+        try {
+            // Map common property names to actual entity field names
+            String mappedSortBy = sortBy;
+            if ("user_id".equalsIgnoreCase(sortBy)) {
+                mappedSortBy = "userId";
+            } else if ("ticket_id".equalsIgnoreCase(sortBy)) {
+                mappedSortBy = "ticketId";
+            } else if ("date_sold".equalsIgnoreCase(sortBy)) {
+                mappedSortBy = "dateSold";
+            }
+
+            Sort sort = ascending ? Sort.by(mappedSortBy).ascending() : Sort.by(mappedSortBy).descending();
+            Pageable pageable = PageRequest.of(page, size, sort);
+            
+            return ticketSoldService.findByUserId(userId, pageable);
+        } catch (Exception e) {
+            // Fallback to default sorting if there's an issue with the provided sortBy parameter
+            Sort sort = Sort.by("id").ascending();
+            Pageable pageable = PageRequest.of(page, size, sort);
+            return ticketSoldService.findByUserId(userId, pageable);
+        }
+    }
 }

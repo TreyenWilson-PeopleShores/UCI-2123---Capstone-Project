@@ -19,4 +19,7 @@ public interface TicketSoldRepository extends JpaRepository<TicketSold, Long> {
     
     @Query("SELECT t FROM TicketSold t WHERE MONTH(t.dateSold) = :month AND YEAR(t.dateSold) = :year")
     Page<TicketSold> findByMonthAndYear(@Param("month") int month, @Param("year") int year, Pageable pageable);
+    
+    @Query("SELECT t FROM TicketSold t WHERE t.userId = :userId")
+    Page<TicketSold> findByUserId(@Param("userId") Long userId, Pageable pageable);
 }

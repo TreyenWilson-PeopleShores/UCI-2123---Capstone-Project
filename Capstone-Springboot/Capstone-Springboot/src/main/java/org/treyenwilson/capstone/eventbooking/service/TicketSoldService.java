@@ -43,6 +43,10 @@ public class TicketSoldService{
     public Page<TicketSold> findByMonthAndYear(int month, int year, Pageable pageable) {
         return repository.findByMonthAndYear(month, year, pageable);
     }
+    
+    public Page<TicketSold> findByUserId(Long userId, Pageable pageable) {
+        return repository.findByUserId(userId, pageable);
+    }
 
     public TicketSoldResponse createTicketSold(@Valid TicketSoldRequest request) {
         TicketSold ticketSold = ticketSoldMapper.toEntity(request);
