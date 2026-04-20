@@ -87,10 +87,12 @@ The system should follow a layered architecture (controller, service, repository
 
 ## 6. Out‑of‑Scope Items
 
-*   Payment processing
-*   Real‑time seat selection
-*   Notification systems (email/SMS)
-*   Advanced analytics dashboards
-*   Multiple ticket types for a single event
-*   Password reset functionality requiring external communication
-*   A user role specific to event organization
+* Payment processing and real monetary transactions
+* Refund handling and ticket charge reversals
+* Integration with third‑party payment providers
+* Real‑time seat selection
+* Notification systems (email/SMS)
+* Advanced analytics dashboards
+* Multiple ticket types for a single event
+* Password reset functionality requiring external communication
+* A user role specific to event organization
