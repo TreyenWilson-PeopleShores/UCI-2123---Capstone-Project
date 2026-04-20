@@ -231,6 +231,7 @@
     max-width: calc(100vw - 32px);
     width: calc(100vw - 32px);
     max-height: 85vh;
+    top: 55%; /* Lower the modal slightly on mobile */
   }
 
   .modal-header {
@@ -253,6 +254,24 @@
   .modal-btn {
     width: 100%;
   }
+
+  /* Adjust slideUp animation for mobile */
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -40%);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -55%);
+    }
+  }
+
+  /* Ensure modal content is scrollable on mobile */
+  .modal-content {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
 }
 
 /* Small mobile devices */
@@ -260,6 +279,7 @@
   .modal {
     max-width: calc(100vw - 24px);
     width: calc(100vw - 24px);
+    top: 55%; /* Lower the modal slightly on small mobile */
   }
 
   .modal-header {
@@ -286,6 +306,24 @@
   .modal-btn {
     font-size: 0.9rem;
     padding: 8px 16px;
+  }
+
+  /* Adjust slideUp animation for small mobile */
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -40%);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -55%);
+    }
+  }
+
+  /* Ensure modal content is scrollable on small screens */
+  .modal-content {
+    max-height: 70vh;
+    overflow-y: auto;
   }
 }
 
