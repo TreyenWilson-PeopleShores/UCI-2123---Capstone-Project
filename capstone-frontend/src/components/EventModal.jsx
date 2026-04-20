@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import StatusBadge from './StatusBadge';
 
-function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased }) {
+function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased, ticketsOwned }) {
   const { currentUser, isAdmin } = useAuth();
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
@@ -14,12 +14,57 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased 
   const [ticketPrice, setTicketPrice] = useState(null);
   const [ticketLoading, setTicketLoading] = useState(false);
   const [ticketError, setTicketError] = useState('');
+  const [venueData, setVenueData] = useState(null);
 
   // Update selectedStatus when event changes
   useEffect(() => {
     if (event) {
       setSelectedStatus(event.status);
     }
+  }, [event]);
+
+  // Fetch venue details if event has venue_id but no venue object
+  useEffect(() => {
+    const fetchVenueIfNeeded = async () => {
+      if (!event) {
+        setVenueData(null);
+        return;
+      }
+
+      // If event already has venue object, use it
+      if (event.venue && typeof event.venue === 'object') {
+        setVenueData(event.venue);
+        return;
+      }
+
+      // If event has venue_id but no venue object, fetch venue
+      const venueId = event.venue_id || event.venueId;
+      if (venueId) {
+        try {
+          const response = await fetch(`/api/venues/id/${venueId}`, {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+          });
+          if (response.ok) {
+            const venue = await response.json();
+            setVenueData(venue);
+            console.log('EventModal fetched venue:', venue);
+          } else {
+            console.error(`Failed to fetch venue ${venueId}: ${response.statusText}`);
+            setVenueData(null);
+          }
+        } catch (err) {
+          console.error(`Error fetching venue ${venueId}:`, err);
+          setVenueData(null);
+        }
+      } else {
+        setVenueData(null);
+      }
+    };
+
+    fetchVenueIfNeeded();
   }, [event]);
 
   // Fetch ticket price when event changes
@@ -342,14 +387,29 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased 
   
   // Safely get venue name
   const getVenueName = () => {
-    if (!event.venue) return 'N/A';
-    
-    if (typeof event.venue === 'string') return event.venue;
-    
-    if (typeof event.venue === 'object') {
-      return event.venue.venue_name || event.venue.name || event.venue.title || 'N/A';
+    if (!event) return 'N/A';
+
+    console.log('EventModal getVenueName called with event:', {
+      id: event.id,
+      venue: event.venue,
+      venueKeys: event.venue && Object.keys(event.venue),
+      venueData,
+      venue_id: event.venue_id || event.venueId,
+    });
+
+    const topLevelVenue = event.venueName || event.venue_name || event.location || event.location_name;
+    if (topLevelVenue) return topLevelVenue;
+
+    // Use venueData if event.venue is missing
+    const venue = event.venue || venueData;
+    if (!venue) return 'N/A';
+    if (typeof venue === 'string') return venue;
+    if (typeof venue === 'object') {
+      const name = venue.venue_name || venue.name || venue.title || venue.venueName || venue.location || venue.location_name;
+      console.log('EventModal extracted venue name:', name);
+      return name || 'N/A';
     }
-    
+
     return 'N/A';
   };
 
@@ -434,6 +494,20 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased 
               )}
             </div>
           </div>
+
+          {/* Tickets Owned (optional) */}
+          {ticketsOwned !== undefined && ticketsOwned > 0 && (
+            <div className="modal-field">
+              <label htmlFor="tickets-owned" className="modal-label">
+                Tickets Owned
+              </label>
+              <div id="tickets-owned" className="modal-value">
+                <span className="tickets-owned-badge">
+                  {ticketsOwned} ticket{ticketsOwned !== 1 ? 's' : ''}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Footer with action button */}

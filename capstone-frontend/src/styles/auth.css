@@ -199,6 +199,16 @@
   outline-offset: -2px;
 }
 
+/* My Tickets button in dropdown */
+.my-tickets-btn {
+  color: #2563eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.my-tickets-btn:hover {
+  background: #eff6ff;
+}
+
 /* Login Prompt Message in Modal */
 .login-prompt {
   margin: 0;

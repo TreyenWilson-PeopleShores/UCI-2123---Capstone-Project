@@ -343,3 +343,17 @@
   color: #dc2626; /* Red color for error */
   font-size: 0.9rem;
 }
+
+/* Tickets Owned Styles */
+.tickets-owned-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: #e8f4ff;
+  color: #2c5282;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid #bee3f8;
+}

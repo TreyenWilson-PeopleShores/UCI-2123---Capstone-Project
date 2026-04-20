@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 const LoginIcon = () => {
   const navigate = useNavigate();
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, isAdmin } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -35,6 +35,11 @@ const LoginIcon = () => {
     navigate('/login');
   };
 
+  const handleMyTickets = () => {
+    setIsDropdownOpen(false);
+    navigate('/my-tickets');
+  };
+
   const displayLetter = currentUser ? currentUser.username.charAt(0).toUpperCase() : 'L';
 
   return (
@@ -58,13 +63,25 @@ const LoginIcon = () => {
       {isDropdownOpen && (
         <div className="profile-dropdown" role="menu">
           {currentUser ? (
-            <button 
-              className="dropdown-item logout-btn"
-              onClick={handleLogout}
-              role="menuitem"
-            >
-              Logout
-            </button>
+            <>
+              {/* Show My Tickets link only for non-admin users */}
+              {!isAdmin && (
+                <button 
+                  className="dropdown-item my-tickets-btn"
+                  onClick={handleMyTickets}
+                  role="menuitem"
+                >
+                  My Tickets
+                </button>
+              )}
+              <button 
+                className="dropdown-item logout-btn"
+                onClick={handleLogout}
+                role="menuitem"
+              >
+                Logout
+              </button>
+            </>
           ) : (
             <button 
               className="dropdown-item login-btn"
