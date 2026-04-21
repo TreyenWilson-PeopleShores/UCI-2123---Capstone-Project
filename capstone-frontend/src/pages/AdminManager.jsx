@@ -9,6 +9,7 @@ function AdminManager() {
   const { currentUser, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
+  const [ticketSummaries, setTicketSummaries] = useState({});
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -75,6 +76,53 @@ function AdminManager() {
     }
   }, [getMonthRange]);
 
+  const fetchTicketSummaries = useCallback(async (eventList) => {
+    const summaryMap = {};
+
+    await Promise.all(eventList.map(async (event) => {
+      try {
+        const response = await fetch(`/api/tickets/event/${event.id}?page=0&size=10`, {
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ticket summary: ${response.statusText}`);
+        }
+
+        const ticketData = await response.json();
+        const ticketRows = Array.isArray(ticketData) ? ticketData : ticketData.content || [];
+
+        if (ticketRows.length === 0) {
+          return;
+        }
+
+        const totalSold = ticketRows.reduce((sum, row) => sum + (Number(row.sold) || 0), 0);
+        const totalQuantity = ticketRows.reduce((sum, row) => sum + (Number(row.total_quantity) || 0), 0);
+
+        summaryMap[event.id] = {
+          sold: totalSold,
+          total_quantity: totalQuantity,
+          event: ticketRows[0].event || event,
+        };
+      } catch (err) {
+        console.error(`Ticket summary fetch failed for event ${event.id}:`, err);
+      }
+    }));
+
+    setTicketSummaries(summaryMap);
+  }, []);
+
+  useEffect(() => {
+    if (isAdmin && events.length > 0) {
+      fetchTicketSummaries(events);
+    } else if (events.length === 0) {
+      setTicketSummaries({});
+    }
+  }, [events, fetchTicketSummaries, isAdmin]);
+
   useEffect(() => {
     if (isAdmin) {
       fetchEventsForMonth(currentMonth);
@@ -107,10 +155,13 @@ function AdminManager() {
 
   const soldOutEvents = useMemo(() => {
     return events.filter((event) => {
-      const tickets = event?.tickets;
-      return tickets && typeof tickets.sold === 'number' && typeof tickets.total === 'number' && tickets.sold === tickets.total;
+      const summary = ticketSummaries[event.id];
+      return event.status === 'SCHEDULED' && 
+             summary && 
+             summary.total_quantity > 0 && 
+             summary.sold >= summary.total_quantity;
     });
-  }, [events]);
+  }, [events, ticketSummaries]);
 
   const formatEventDate = (dateValue) => {
     if (!dateValue) return 'Unknown date';
@@ -184,7 +235,7 @@ function AdminManager() {
                       className="sold-out-item"
                       onClick={() => handleEventClick(event)}
                     >
-                      <span className="sold-out-title">{event.title || event.name || 'Unnamed event'}</span>
+                      <span className="sold-out-title">{event.event_name || event.title || event.name || 'Unnamed event'}</span>
                       <span className="sold-out-meta">{formatEventDate(event.date)} · {getVenueLabel(event)}</span>
                     </button>
                   </li>
