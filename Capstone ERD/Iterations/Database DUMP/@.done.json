@@ -1,0 +1,29 @@
+{
+    "end": "2026-04-02 13:31:05",
+    "dataBytes": 214793,
+    "tableDataBytes": {
+        "capstone_improved": {
+            "users": 200,
+            "events": 57221,
+            "tickets_sold": 130506,
+            "tickets": 26126,
+            "venues": 740
+        }
+    },
+    "tableRows": {
+        "capstone_improved": {
+            "users": 8,
+            "events": 1041,
+            "tickets_sold": 6000,
+            "tickets": 1041,
+            "venues": 20
+        }
+    },
+    "chunkFileBytes": {
+        "capstone_improved@users@@0.tsv.zst": 200,
+        "capstone_improved@events@@0.tsv.zst": 57221,
+        "capstone_improved@venues@@0.tsv.zst": 740,
+        "capstone_improved@tickets_sold@@0.tsv.zst": 130506,
+        "capstone_improved@tickets@@0.tsv.zst": 26126
+    }
+}

@@ -1,0 +1,9 @@
+[ React Frontend ]
+        |
+     HTTP / REST
+        |
+[ Spring Boot API ]
+        |
+     JPA / Hibernate
+        |
+[ MySQL Database ]

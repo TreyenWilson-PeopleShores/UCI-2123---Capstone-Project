@@ -1,0 +1,114 @@
+/* ===== LAYOUT STYLES ===== */
+/* Header, app wrapper, main layout */
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  position: relative;
+  background: #ffffff;
+  padding: 16px;
+  border-bottom: 1px solid #e5e9f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+main {
+  flex: 1;
+  padding: 16px;
+}
+
+/* Mobile-first responsive styles for layout */
+@media (max-width: 768px) {
+  header {
+    padding: 12px 16px;
+  }
+
+  header h1 {
+    font-size: 1.25rem;
+  }
+}
+
+/* Desktop adjustments for layout */
+@media (min-width: 769px) {
+  header {
+    padding: 20px;
+  }
+
+  header h1 {
+    font-size: 2rem;
+  }
+}
+
+/* ===== EVENTS PAGE LAYOUT ===== */
+.events-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.events-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.upcoming-events-container {
+  width: 100%;
+}
+
+.calendar-container {
+  width: 100%;
+}
+
+/* Desktop layout: sidebar + main content */
+@media (min-width: 1024px) {
+  .events-layout {
+    flex-direction: row;
+    gap: 32px;
+    align-items: flex-start;
+  }
+  
+  .upcoming-events-container {
+    width: 320px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 24px;
+  }
+  
+  .calendar-container {
+    flex: 1;
+    min-width: 0; /* Allows calendar to shrink if needed */
+  }
+  
+  /* Adjust calendar width for sidebar layout */
+  .cal-component {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+}
+
+/* Tablet layout adjustments */
+@media (min-width: 769px) and (max-width: 1023px) {
+  .events-layout {
+    gap: 32px;
+  }
+  
+  .upcoming-events-container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}

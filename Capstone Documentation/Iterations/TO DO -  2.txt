@@ -1,0 +1,266 @@
+✅ A “No Scope Creep” Checklist (Follow This)
+Use this exact order — don’t skip around.
+✅ Step 1: Finish the Events Table (Close It Completely)
+
+ - Add pagination to date-range endpoint
+ - Add validation annotations to Event entity
+ - Add global error handling (@ControllerAdvice)
+ - Ensure all event endpoints return clean HTTP statuses
+
+📌 When this is done:
+
+“Events are production-ready.”
+
+==================
+
+✅ Step 2: Add ONE New Table (Users OR Venues — not both)
+For the next table:
+
+Schema
+Entity
+Repository
+Service
+Controller
+Validation
+Error handling
+Basic pagination
+
+Then stop.
+
+✅ Step 3: Relationships (Only After Both Sides Exist)
+Only once Events + Venues (or Users) exist:
+
+Add @ManyToOne
+Add @OneToMany
+Test joins
+Do NOT add business logic yet
+
+
+✅ Step 4: Then — and only then — Phase 4 Topics
+
+Password encryption
+Security
+JWT
+
+You are correct: those belong later.
+======
+
+
+Do it in this order:
+
+✅ Global error handling
+✅ Confirm validation responses appear in Postman
+✅ Then add case testing
+✅ Freeze Events and use it as the template
+
+
+======
+
+
+Short answer: **yes** ✅ — you have successfully built **real, reusable test logic**, and you can absolutely reuse this **same pattern** for your “proper” tests for both **POST** and **GET** (and later PUT). What you just achieved is the *hardest part* of Spring Boot testing.
+
+Now let’s lock this in and answer the second part clearly: **what tests do you actually need** (minimum, capstone‑appropriate, no overkill).
+
+***
+
+## ✅ What you have already accomplished (important to recognize)
+
+You now have:
+
+*   ✅ A **real integration test**
+*   ✅ Using `@SpringBootTest` + `MockMvc`
+*   ✅ Posting JSON into the app
+*   ✅ Data actually being persisted (H2)
+*   ✅ Correct REST semantics (`201 Created`)
+*   ✅ GET succeeding *because* POST ran first
+
+That means:
+
+> **You are no longer “experimenting” — you are writing real backend tests.**
+
+Yes, this logic is **reusable**. In fact, this exact POST → GET flow becomes your **template**.
+
+***
+
+## ✅ What this test pattern proves
+
+Your current working test proves **all of this at once**:
+
+*   Controller mapping works
+*   Request body binding works
+*   Validation allows valid input
+*   Service logic runs
+*   Repository persists data
+*   DB configuration is correct (H2)
+*   Correct HTTP status is returned
+*   GET endpoint can retrieve persisted data
+
+That’s a **full vertical slice**. Most beginner projects *never* reach this point.
+
+***
+
+## ✅ So what other tests do you need?
+
+Here’s the **minimal, correct test set** for the Events backend. This matches Capstone expectations without scope creep.
+
+### 1️⃣ POST – success case ✅ (you already have this)
+
+**Purpose:** prove creation works
+
+**Test logic (conceptually):**
+
+*   POST valid JSON
+*   Expect `201 Created`
+*   Optionally assert response contains an `id`
+
+✅ You have this.
+
+***
+
+### 2️⃣ GET by ID – success case ✅ (you already have this)
+
+**Purpose:** prove retrieval works
+
+**Test logic:**
+
+*   POST event
+*   GET `/api/events/id/{id}`
+*   Expect `200 OK`
+
+✅ You effectively have this already.
+
+> 🔑 Best practice (optional improvement):  
+> Use the `id` returned by POST instead of hard‑coding `/id/1`.  
+> But this is polish, not required to move on.
+
+***
+
+### 3️⃣ POST – validation failure ❗ (important)
+
+**Purpose:** prove your validation + global error handling works
+
+**Test logic:**
+
+*   POST invalid JSON (missing `event_name` or `total_spots`)
+*   Expect `400 Bad Request`
+*   Optionally assert `fieldErrors` exists
+
+This directly supports:
+
+*   your validation annotations
+*   your `GlobalExceptionHandler`
+
+This is a **Capstone must-have** test.
+
+***
+
+### 4️⃣ GET by ID – not found ❗
+
+**Purpose:** prove correct 404 behavior
+
+**Test logic:**
+
+*   GET `/api/events/id/999999`
+*   Expect `404 Not Found`
+
+This proves:
+
+*   correct exception throwing
+*   correct error mapping
+*   no silent failures
+
+***
+
+### 5️⃣ PUT – status change (since you implemented PUT)
+
+**Purpose:** prove modification works
+
+**Test logic:**
+
+*   POST event
+*   PUT `/api/events/id/{id}/{newStatus}`
+*   Expect `200 OK`
+*   Optionally GET and verify status changed
+
+This satisfies the “modify events” requirement.
+
+***
+
+## ✅ That’s it. Stop there.
+
+You **do not** need to test:
+
+*   pagination edge cases
+*   sorting logic
+*   every possible invalid enum
+*   DB constraint failures
+
+Those are **polish**, not requirements.
+
+***
+
+## ✅ Reuse strategy (this is the big win)
+
+You now have a **repeatable pattern**:
+
+> **POST → assert → GET → assert**
+
+You can reuse this exact logic for:
+
+*   Venues
+*   Users
+*   Bookings
+
+Only change:
+
+*   endpoint URL
+*   JSON body fields
+
+Everything else stays the same.
+
+That’s what the Capstone means by *“reuse previous work.”*
+
+***
+
+## ✅ Is your test “good practice”?
+
+Yes — and more than that:
+
+*   You’re using **integration testing**, not fake mocks
+*   You’re testing real behavior, not implementation details
+*   You’re validating REST contracts
+
+That’s **better** than many production test suites.
+
+***
+
+## ✅ Final checklist (so you know when to move on)
+
+You can confidently move to the next backend entity once you have:
+
+*   ✅ POST success test
+*   ✅ POST validation failure test
+*   ✅ GET by ID success test
+*   ✅ GET by ID not found test
+*   ✅ PUT status change test
+
+If you have those, **Events is DONE**.
+
+***
+
+## ✅ Bottom line
+
+*   ✅ Yes, you just wrote real tests
+*   ✅ Yes, the logic is reusable
+*   ✅ Yes, this satisfies Capstone backend testing
+*   ❌ No, you do not need more tests than this
+
+You’re officially past the “hard part.”
+
+If you want next, I can:
+
+*   help you **name these tests cleanly**
+*   help you decide **Venues vs Users next**
+*   help you define the **minimum tests for the next entity**
+
+But right now — take the win.

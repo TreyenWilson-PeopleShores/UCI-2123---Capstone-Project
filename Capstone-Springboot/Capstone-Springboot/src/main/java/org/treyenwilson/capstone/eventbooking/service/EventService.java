@@ -1,27 +1,91 @@
 package org.treyenwilson.capstone.eventbooking.service;
 
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.treyenwilson.capstone.eventbooking.dto.EventRequest;
+import org.treyenwilson.capstone.eventbooking.dto.EventResponse;
 import org.treyenwilson.capstone.eventbooking.entity.Event;
+import org.treyenwilson.capstone.eventbooking.exception.ResourceNotFoundException;
+import org.treyenwilson.capstone.eventbooking.mapper.EventMapper;
 import org.treyenwilson.capstone.eventbooking.repository.EventRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
-public class EventService {
+public class EventService{
     private final EventRepository repository;
+    private final EventMapper eventMapper;
 
-    public EventService(EventRepository repository) {
+    public EventService(EventRepository repository, EventMapper eventMapper) {
         this.repository = repository;
+        this.eventMapper = eventMapper;
     }
 
     public List<Event> getAllEvents(){
         return  repository.findAll();
     }
+// old get by event
+//    public Event getByEventId(Long id) {
+//        return repository.findById(id)
+//                .orElseThrow(() -> new ResourceNotFoundException("Event", id));
+//    }
 
-    public Event getByEventId(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Test"));
+    //new get by event
+
+    public EventResponse getByEventId(Long id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Event", id));
+        return eventMapper.toResponse(event);
+    }
+
+
+    @Autowired
+    private EventRepository eventRepository;
+
+//    public List<Event> getByEventStatus(String status) {
+//        return eventRepository.findByStatus(status);
+//
+//    } - old find by status
+
+    // Pagination Code
+    public Page<Event> findAll(Pageable pageable) {
+        return eventRepository.findAll(pageable);
+    }
+    public Page<Event> findByStatus(Pageable pageable, String status) {
+        return eventRepository.findByStatus(pageable, status);
+    }
+
+
+
+    public Page<Event> filterByDate(LocalDate start, LocalDate end, Pageable pageable) {
+
+        return eventRepository.findByDateBetween(start, end, pageable);
+    }
+
+//    public Event save(@Valid Event newEvent) {
+//        return eventRepository.save(newEvent);
+//    } - old way of saving
+
+
+    public EventResponse createEvent(@Valid EventRequest request) {
+        Event event = eventMapper.toEntity(request);
+        Event saved = eventRepository.save(event);
+        return eventMapper.toResponse(saved);
+    }
+
+    public EventResponse changeStatus(Long id, String status) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(); // to add error exception here
+        event.setStatus(status);
+        Event saved = eventRepository.save(event);
+        return eventMapper.toResponse(saved);
     }
 }
