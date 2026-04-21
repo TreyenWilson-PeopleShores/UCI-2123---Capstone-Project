@@ -11,7 +11,8 @@ public class UserMapper {
         UserResponse response = new UserResponse();
         response.setId(user.getId());
         response.setUsername(user.getUsername());
-        response.setPassword(user.getPassword());
+        // Do NOT include password in response for security
+        response.setPassword(null);
         response.setRole(user.getRole());
         return response;
     }
