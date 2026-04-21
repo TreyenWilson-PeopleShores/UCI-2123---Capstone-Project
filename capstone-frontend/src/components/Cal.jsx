@@ -165,6 +165,7 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
   return (
     <section className="cal-component" aria-label="Event calendar">
       <h2>Event Calendar</h2>
+      <div className="calendar-divider" aria-hidden="true" />
       
       <div className="calendar-navigation" role="navigation" aria-label="Calendar navigation">
         <ArrowButton

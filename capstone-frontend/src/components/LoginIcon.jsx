@@ -64,6 +64,19 @@ const LoginIcon = () => {
         <div className="profile-dropdown" role="menu">
           {currentUser ? (
             <>
+              {/* Show Admin Manager link only for admin users */}
+              {isAdmin && (
+                <button
+                  className="dropdown-item admin-manager-btn"
+                  onClick={() => {
+                    setIsDropdownOpen(false);
+                    navigate('/admin-manager');
+                  }}
+                  role="menuitem"
+                >
+                  Admin Manager
+                </button>
+              )}
               {/* Show My Tickets link only for non-admin users */}
               {!isAdmin && (
                 <button 
