@@ -20,35 +20,34 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  // Login: fetch user from API and store
-  const login = async (username) => {
+  // Login: authenticate with backend
+  const login = async (username, password) => {
     try {
       const response = await fetch(
-        `/api/users?page=0&size=100&sortBy=username&ascending=true`,
+        `/auth/login`,
         {
+          method: 'POST',
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
           },
+          body: JSON.stringify({ username, password }),
         }
       );
 
       if (!response.ok) {
-        throw new Error('Failed to fetch users');
+        if (response.status === 401) {
+          throw new Error('Invalid username or password');
+        }
+        throw new Error('Login failed');
       }
 
-      const data = await response.json();
-      const users = data.content || data;
-      const user = users.find(u => u.username === username);
+      const user = await response.json();
 
-      if (!user) {
-        throw new Error('User not found');
-      }
-
-      // Store user with role (default: USER, check if ADMIN field exists)
+      // Store user with role
       const userWithRole = {
         username: user.username,
-        role: user.role || 'USER', // Assume 'role' field exists; default to USER
+        role: user.role || 'USER',
         id: user.id,
       };
 
