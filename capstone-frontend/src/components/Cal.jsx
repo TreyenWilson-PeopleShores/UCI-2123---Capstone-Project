@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import ArrowButton from './ArrowButton';
 
 function Cal({ events = [], loading = false, currentMonth: currentDate = new Date(), onMonthChange, onStatusChange, onTicketPurchased, onEventClick }) {
   // Event handlers
@@ -166,28 +167,26 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
       <h2>Event Calendar</h2>
       
       <div className="calendar-navigation" role="navigation" aria-label="Calendar navigation">
-        <button 
-          className="nav-button"
+        <ArrowButton
+          direction="left"
           onClick={goToPreviousMonth}
-          aria-label={`Go to previous month, ${monthNames[currentMonth === 0 ? 11 : currentMonth - 1]} ${currentMonth === 0 ? currentYear - 1 : currentYear}`}
           disabled={loading}
-        >
-          &larr;
-        </button>
+          label={`Go to previous month, ${monthNames[currentMonth === 0 ? 11 : currentMonth - 1]} ${currentMonth === 0 ? currentYear - 1 : currentYear}`}
+          className="nav-button"
+        />
         
         <h3 className="current-month" id="current-month-heading">
           {monthNames[currentMonth]} {currentYear}
           {loading && ' (loading...)'}
         </h3>
         
-        <button 
-          className="nav-button"
+        <ArrowButton
+          direction="right"
           onClick={goToNextMonth}
-          aria-label={`Go to next month, ${monthNames[currentMonth === 11 ? 0 : currentMonth + 1]} ${currentMonth === 11 ? currentYear + 1 : currentYear}`}
           disabled={loading}
-        >
-          &rarr;
-        </button>
+          label={`Go to next month, ${monthNames[currentMonth === 11 ? 0 : currentMonth + 1]} ${currentMonth === 11 ? currentYear + 1 : currentYear}`}
+          className="nav-button"
+        />
       </div>
       
       <div className="calendar-grid" role="grid" aria-labelledby="current-month-heading" aria-readonly="true">

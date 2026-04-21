@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import EventModal from '../components/EventModal';
+import ArrowButton from '../components/ArrowButton';
 import '../styles/MyTickets.css';
 
 function MyTickets() {
@@ -410,25 +411,21 @@ function MyTickets() {
       </div>
       
       <div className="pagination-controls">
-        <button
-          type="button"
-          className="pagination-button"
+        <ArrowButton
+          direction="left"
           onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
           disabled={page <= 0}
-        >
-          Previous
-        </button>
+          label="Go to previous page"
+        />
         <span className="pagination-info">
           Page {page + 1} of {totalPages || 1}
         </span>
-        <button
-          type="button"
-          className="pagination-button"
+        <ArrowButton
+          direction="right"
           onClick={() => setPage((prev) => Math.min(prev + 1, Math.max(totalPages - 1, 0)))}
           disabled={totalPages <= 1 || page >= totalPages - 1}
-        >
-          Next
-        </button>
+          label="Go to next page"
+        />
       </div>
 
       <div className="tickets-list">
