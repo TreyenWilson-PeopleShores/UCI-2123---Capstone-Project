@@ -166,9 +166,32 @@ function AdminManager() {
   const formatEventDate = (dateValue) => {
     if (!dateValue) return 'Unknown date';
     try {
-      const parsed = new Date(dateValue);
-      if (Number.isNaN(parsed.getTime())) return 'Unknown date';
-      return parsed.toLocaleDateString('en-US', {
+      // Parse date string manually to avoid timezone issues
+      // Expected format: YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss
+      const dateStr = String(dateValue);
+      const dateMatch = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      
+      if (!dateMatch) {
+        // Fallback to Date object if format doesn't match
+        const date = new Date(dateValue);
+        if (Number.isNaN(date.getTime())) return 'Unknown date';
+        
+        return date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        });
+      }
+      
+      // Extract year, month, day from the string
+      const year = parseInt(dateMatch[1], 10);
+      const month = parseInt(dateMatch[2], 10) - 1; // Convert to 0-indexed
+      const day = parseInt(dateMatch[3], 10);
+      
+      // Create date object with local timezone (midnight)
+      const date = new Date(year, month, day);
+      
+      return date.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
         year: 'numeric',
@@ -179,7 +202,7 @@ function AdminManager() {
   };
 
   const getVenueLabel = (event) => {
-    return event?.venue?.name || event?.venue_name || event?.location || 'Venue unknown';
+    return event?.venue?.venue_name || event?.venue?.name || event?.venue_name || event?.location || 'Venue unknown';
   };
 
   return (
