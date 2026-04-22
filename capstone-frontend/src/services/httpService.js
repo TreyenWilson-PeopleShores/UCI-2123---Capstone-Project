@@ -1,9 +1,19 @@
 import { buildApiUrl, defaultJsonHeaders } from './apiConfig';
 
-const normalizeHeaders = (headers = {}) => ({
-  ...defaultJsonHeaders,
-  ...headers,
-});
+const normalizeHeaders = (headers = {}) => {
+  const normalized = {
+    ...defaultJsonHeaders,
+    ...headers,
+  };
+  
+  // Add Authorization header if we have a JWT token
+  const token = localStorage.getItem('accessToken');
+  if (token) {
+    normalized['Authorization'] = `Bearer ${token}`;
+  }
+  
+  return normalized;
+};
 
 const handleErrorResponse = async (response) => {
   let message = response.statusText || 'Request failed';

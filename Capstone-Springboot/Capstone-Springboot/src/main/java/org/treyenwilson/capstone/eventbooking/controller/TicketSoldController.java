@@ -6,8 +6,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.treyenwilson.capstone.eventbooking.dto.TicketSoldRequest;
+import org.treyenwilson.capstone.eventbooking.security.SecurityUtil;
 import org.treyenwilson.capstone.eventbooking.dto.TicketSoldResponse;
 import org.treyenwilson.capstone.eventbooking.entity.TicketSold;
 import org.treyenwilson.capstone.eventbooking.service.TicketSoldService;
@@ -16,18 +18,22 @@ import org.treyenwilson.capstone.eventbooking.service.TicketSoldService;
 @RequestMapping("/api/tickets-sold")
 public class TicketSoldController {
     private final TicketSoldService ticketSoldService;
+    private final SecurityUtil securityUtil;
 
-    public TicketSoldController(TicketSoldService ticketSoldService) {
+    public TicketSoldController(TicketSoldService ticketSoldService, SecurityUtil securityUtil) {
         this.ticketSoldService = ticketSoldService;
+        this.securityUtil = securityUtil;
     }
 
     @GetMapping("id/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     // Example call: http://localhost:8080/api/tickets-sold/id/1
     public ResponseEntity<TicketSoldResponse> getByTicketSoldId(@PathVariable Long id){
         return ResponseEntity.ok(ticketSoldService.getByTicketSoldId(id));
     }
 
     @PostMapping()
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     // Example call: POST http://localhost:8080/api/tickets-sold with JSON body
     public ResponseEntity<TicketSoldResponse> createTicketSold(@Valid @RequestBody TicketSoldRequest request) {
         TicketSoldResponse response = ticketSoldService.createTicketSold(request);
@@ -35,6 +41,7 @@ public class TicketSoldController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     // Example calls: 
     // http://localhost:8080/api/tickets-sold?page=0&size=10&sortBy=dateSold&ascending=true
     // http://localhost:8080/api/tickets-sold?month=4 (April tickets)
@@ -81,6 +88,7 @@ public class TicketSoldController {
     }
 
     @GetMapping("/user/{userId}")
+    @PreAuthorize("hasRole('ADMIN') or @securityUtil.isCurrentUser(#userId)")
     // Example call: http://localhost:8080/api/tickets-sold/user/3?page=0&size=10&sortBy=dateSold&ascending=true
     public Page<TicketSold> getTicketsSoldByUserId(
             @PathVariable Long userId,

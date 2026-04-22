@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.treyenwilson.capstone.eventbooking.dto.EventRequest;
 import org.treyenwilson.capstone.eventbooking.dto.EventResponse;
@@ -37,6 +38,7 @@ public class EventController {
     }
 
     @PutMapping("id/{id}/{status}")
+    @PreAuthorize("hasRole('ADMIN')")
     // .../id/{id}/{status: cancelled, completed, or scheduled}
     public ResponseEntity<EventResponse> changeStatus(
             @PathVariable Long id,

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.treyenwilson.capstone.eventbooking.dto.TicketRequest;
 import org.treyenwilson.capstone.eventbooking.dto.TicketResponse;
@@ -28,6 +29,7 @@ public class TicketController {
     }
 
     @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     // Example call: POST http://localhost:8080/api/tickets with JSON body
     public ResponseEntity<TicketResponse> createTicket(@Valid @RequestBody TicketRequest request) {
         TicketResponse response = ticketService.createTicket(request);
@@ -35,13 +37,23 @@ public class TicketController {
     }
 
     @PutMapping("id/{id}/sold/{sold}")
+    @PreAuthorize("hasRole('ADMIN')")
     // Example call: PUT http://localhost:8080/api/tickets/1/sold/50
     public ResponseEntity<TicketResponse> updateSoldCount(@PathVariable Long id, @PathVariable Long sold) {
         TicketResponse response = ticketService.updateSoldCount(id, sold);
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("id/{id}/increment-sold")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    // Example call: PUT http://localhost:8080/api/tickets/1/increment-sold
+    public ResponseEntity<TicketResponse> incrementSoldCount(@PathVariable Long id) {
+        TicketResponse response = ticketService.incrementSoldCount(id);
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("delete/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     // Example call: DELETE http://localhost:8080/api/tickets/delete/1
     public ResponseEntity<Void> deleteTicket(@PathVariable Long id) {
         ticketService.deleteTicket(id);

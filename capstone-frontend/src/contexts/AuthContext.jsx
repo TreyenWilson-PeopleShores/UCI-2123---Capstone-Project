@@ -10,12 +10,20 @@ export function AuthProvider({ children }) {
   // Load user from localStorage on mount
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
+    const token = localStorage.getItem('accessToken');
+    
+    // If we have user but no token, clear user (need to re-login with JWT)
+    if (savedUser && !token) {
+      console.warn('User found but no JWT token. Clearing user data.');
+      localStorage.removeItem('currentUser');
+      setCurrentUser(null);
+    } else if (savedUser && token) {
       try {
         setCurrentUser(JSON.parse(savedUser));
       } catch (e) {
         console.error('Failed to parse saved user:', e);
         localStorage.removeItem('currentUser');
+        localStorage.removeItem('accessToken');
       }
     }
     setLoading(false);
@@ -24,7 +32,11 @@ export function AuthProvider({ children }) {
   // Login: authenticate with backend
   const login = async (username, password) => {
     try {
-      const user = await loginWithApi(username, password);
+      const authData = await loginWithApi(username, password);
+      
+      // Extract user info from response
+      // The new JWT endpoint returns { accessToken, tokenType, user: { id, username, role } }
+      const user = authData.user || authData; // Fallback to old format
       const userWithRole = {
         username: user.username,
         role: user.role || 'USER',
@@ -40,10 +52,11 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Logout: clear user
+  // Logout: clear user and token
   const logout = () => {
     setCurrentUser(null);
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('accessToken');
   };
 
   const isAdmin = currentUser?.role === 'ADMIN';

@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import StatusBadge from './StatusBadge';
 import LoadingSpinner from './LoadingSpinner';
 import { getVenueById } from '../services/venuesService';
-import { getTicketsByEventId, createTicketSale, updateTicketSoldCount } from '../services/ticketsService';
+import { getTicketsByEventId, createTicketSale, updateTicketSoldCount, incrementTicketSoldCount } from '../services/ticketsService';
 import { updateEventStatus } from '../services/eventsService';
 
 function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased, ticketsOwned }) {
@@ -281,10 +281,9 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased,
       console.log('Creating ticket sale with body:', ticketSaleBody);
       await createTicketSale(ticketSaleBody);
       
-      // Step 3: Update ticket sold count
-      const newSoldCount = ticket.sold + 1;
-      console.log(`Updating ticket sold count to: ${newSoldCount}`);
-      await updateTicketSoldCount(ticket.id, newSoldCount);
+      // Step 3: Increment ticket sold count
+      console.log(`Incrementing ticket sold count for ticket ID: ${ticket.id}`);
+      await incrementTicketSoldCount(ticket.id);
       
       // Success!
       setPurchaseMessage('Ticket purchased successfully!');

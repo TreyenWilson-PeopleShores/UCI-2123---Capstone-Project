@@ -71,4 +71,12 @@ public class TicketService{
         repository.deleteById(id);
     }
 
+    public TicketResponse incrementSoldCount(Long id) {
+        Ticket ticket = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket", id));
+        ticket.setSold(ticket.getSold() + 1);
+        Ticket saved = repository.save(ticket);
+        return ticketMapper.toResponse(saved);
+    }
+
 }

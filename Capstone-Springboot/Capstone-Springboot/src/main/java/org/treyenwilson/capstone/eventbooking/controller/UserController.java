@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.treyenwilson.capstone.eventbooking.dto.UserRequest;
 import org.treyenwilson.capstone.eventbooking.dto.UserResponse;
@@ -35,6 +36,7 @@ public class UserController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     // Example call: http://localhost:8080/api/users?page=0&size=10&sortBy=username&ascending=true
     public Page<User> getAllUsers(
             @RequestParam(defaultValue = "0") int page,

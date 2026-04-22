@@ -29,6 +29,11 @@ export async function updateTicketSoldCount(ticketId, soldCount) {
   return response.json().catch(() => null);
 }
 
+export async function incrementTicketSoldCount(ticketId) {
+  const response = await apiPut(`/api/tickets/id/${ticketId}/increment-sold`);
+  return response.json().catch(() => null);
+}
+
 export async function getUserTicketSales(userId, options = {}) {
   const {
     page = 0,

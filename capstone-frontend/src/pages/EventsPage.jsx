@@ -175,7 +175,7 @@ function EventsPage() {
   return (
     <div className="events-page">
       <h1>Events</h1>
-      <p>
+      <div className="events-summary">
         Showing events for {currentMonthName} {currentYear}: {eventState.events.length} event{eventState.events.length !== 1 ? 's' : ''}
         {eventState.loading && (
           <span style={{ marginLeft: '8px' }}>
@@ -183,7 +183,7 @@ function EventsPage() {
             <span style={{ marginLeft: '8px' }}>loading...</span>
           </span>
         )}
-      </p>
+      </div>
       
       {/* Responsive Layout Container */}
       <div className="events-layout">
