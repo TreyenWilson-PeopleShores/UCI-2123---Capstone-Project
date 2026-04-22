@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useReducer } from 'react';
 import Cal from '../components/Cal';
 import UpcomingEvents from '../components/UpcomingEvents';
 import EventModal from '../components/EventModal';
+import LoadingSpinner from '../components/LoadingSpinner';
+import CalendarSkeleton from '../components/CalendarSkeleton';
 import { getAllEventsByDateRange, getEventsByDateRange } from '../services/eventsService';
 
 // Reducer for event loading state
@@ -175,31 +177,52 @@ function EventsPage() {
       <h1>Events</h1>
       <p>
         Showing events for {currentMonthName} {currentYear}: {eventState.events.length} event{eventState.events.length !== 1 ? 's' : ''}
-        {eventState.loading && ' (loading...)'}
+        {eventState.loading && (
+          <span style={{ marginLeft: '8px' }}>
+            <LoadingSpinner size="small" />
+            <span style={{ marginLeft: '8px' }}>loading...</span>
+          </span>
+        )}
       </p>
       
       {/* Responsive Layout Container */}
       <div className="events-layout">
         {/* Upcoming Events Section - Sidebar on desktop, top on mobile */}
         <div className="upcoming-events-container">
-          <UpcomingEvents 
-            maxEvents={5} 
-            onEventClick={handleEventClick}
-            events={eventState.events}
-          />
+          {eventState.loading ? (
+            <div className="skeleton-card event-card-skeleton" style={{ marginBottom: '20px' }}>
+              <div className="skeleton skeleton-image"></div>
+              <div className="skeleton-content">
+                <div className="skeleton skeleton-title"></div>
+                <div className="skeleton skeleton-text"></div>
+                <div className="skeleton skeleton-text short"></div>
+                <div className="skeleton skeleton-button"></div>
+              </div>
+            </div>
+          ) : (
+            <UpcomingEvents 
+              maxEvents={5} 
+              onEventClick={handleEventClick}
+              events={eventState.events}
+            />
+          )}
         </div>
         
         {/* Calendar Section - Main content area */}
         <div className="calendar-container">
-          <Cal 
-            events={eventState.events} 
-            loading={eventState.loading} 
-            currentMonth={currentMonth} 
-            onMonthChange={handleMonthChange}
-            onStatusChange={handleStatusChange}
-            onTicketPurchased={handleTicketPurchased}
-            onEventClick={handleEventClick}
-          />
+          {eventState.loading ? (
+            <CalendarSkeleton />
+          ) : (
+            <Cal 
+              events={eventState.events} 
+              loading={eventState.loading} 
+              currentMonth={currentMonth} 
+              onMonthChange={handleMonthChange}
+              onStatusChange={handleStatusChange}
+              onTicketPurchased={handleTicketPurchased}
+              onEventClick={handleEventClick}
+            />
+          )}
         </div>
       </div>
       

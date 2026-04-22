@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import ArrowButton from './ArrowButton';
+import LoadingSpinner from './LoadingSpinner';
 
 function Cal({ events = [], loading = false, currentMonth: currentDate = new Date(), onMonthChange, onStatusChange, onTicketPurchased, onEventClick }) {
   // Event handlers
@@ -179,7 +180,12 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
         
         <h3 className="current-month" id="current-month-heading">
           {monthNames[currentMonth]} {currentYear}
-          {loading && ' (loading...)'}
+          {loading && (
+            <span style={{ marginLeft: '8px' }}>
+              <LoadingSpinner size="small" />
+              <span style={{ marginLeft: '8px' }}>loading...</span>
+            </span>
+          )}
         </h3>
         
         <ArrowButton

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import StatusBadge from './StatusBadge';
+import LoadingSpinner from './LoadingSpinner';
 import { getAllEventsByDateRange } from '../services/eventsService';
 import '../styles/EventList.css';
 
@@ -159,7 +160,8 @@ const UpcomingEvents = ({ maxEvents = 5, onEventClick, events: providedEvents })
       <div className="event-list-container">
         <h2 className="event-list-title">Upcoming Events</h2>
         <div className="event-loading">
-          <p>Loading upcoming events...</p>
+          <LoadingSpinner size="small" />
+          <p style={{ marginTop: '8px' }}>Loading upcoming events...</p>
         </div>
       </div>
     );

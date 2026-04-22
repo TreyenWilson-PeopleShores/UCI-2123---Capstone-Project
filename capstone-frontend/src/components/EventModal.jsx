@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useAuth } from '../contexts/AuthContext';
 import StatusBadge from './StatusBadge';
+import LoadingSpinner from './LoadingSpinner';
 import { getVenueById } from '../services/venuesService';
 import { getTicketsByEventId, createTicketSale, updateTicketSoldCount } from '../services/ticketsService';
 import { updateEventStatus } from '../services/eventsService';
@@ -417,7 +418,10 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased,
             </label>
             <div id="ticket-price" className="modal-value">
               {ticketLoading ? (
-                <span className="ticket-price-loading">Loading price...</span>
+                <div className="ticket-price-loading">
+                  <LoadingSpinner size="small" />
+                  <span style={{ marginLeft: '8px' }}>Loading price...</span>
+                </div>
               ) : ticketError ? (
                 <span className="ticket-price-error">{ticketError}</span>
               ) : (
@@ -452,7 +456,12 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased,
                 disabled={isPurchasing}
                 aria-label={`Purchase ticket for ${getEventName()}`}
               >
-                {isPurchasing ? 'Purchasing...' : 'Buy Ticket'}
+                {isPurchasing ? (
+                  <>
+                    <LoadingSpinner size="small" color="light" />
+                    <span style={{ marginLeft: '8px' }}>Purchasing...</span>
+                  </>
+                ) : 'Buy Ticket'}
               </button>
               {purchaseMessage && (
                 <p className="purchase-success" style={{ color: 'green', marginTop: '10px' }}>

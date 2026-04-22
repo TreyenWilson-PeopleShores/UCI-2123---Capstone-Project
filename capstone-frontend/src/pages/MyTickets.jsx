@@ -3,6 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import EventModal from '../components/EventModal';
 import ArrowButton from '../components/ArrowButton';
+import LoadingSpinner from '../components/LoadingSpinner';
+import EventCardSkeleton from '../components/EventCardSkeleton';
 import { getUserTicketSales, getTicketById } from '../services/ticketsService';
 import { getEventById } from '../services/eventsService';
 import { getVenueById } from '../services/venuesService';
@@ -314,7 +316,11 @@ function MyTickets() {
           <Link to="/" className="back-to-events-btn">Back to Events</Link>
         </div>
         <div className="loading-container">
-          <p>Loading your tickets...</p>
+          <LoadingSpinner size="medium" />
+          <p style={{ marginTop: '16px' }}>Loading your tickets...</p>
+        </div>
+        <div className="tickets-list">
+          <EventCardSkeleton count={3} />
         </div>
       </div>
     );

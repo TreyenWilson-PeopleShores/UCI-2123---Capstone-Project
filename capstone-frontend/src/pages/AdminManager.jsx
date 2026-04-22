@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Cal from '../components/Cal';
 import EventModal from '../components/EventModal';
+import LoadingSpinner from '../components/LoadingSpinner';
+import CalendarSkeleton from '../components/CalendarSkeleton';
 import { useAuth } from '../contexts/AuthContext';
 import { getAllEventsByDateRange } from '../services/eventsService';
 import { getTicketsByEventId } from '../services/ticketsService';
@@ -193,15 +195,19 @@ function AdminManager() {
 
       <div className="admin-manager-content">
         <section className="admin-manager-calendar-panel">
-          <Cal
-            events={events}
-            loading={loadingEvents}
-            currentMonth={currentMonth}
-            onMonthChange={handleMonthChange}
-            onStatusChange={handleStatusChange}
-            onTicketPurchased={handleTicketPurchased}
-            onEventClick={handleEventClick}
-          />
+          {loadingEvents ? (
+            <CalendarSkeleton />
+          ) : (
+            <Cal
+              events={events}
+              loading={loadingEvents}
+              currentMonth={currentMonth}
+              onMonthChange={handleMonthChange}
+              onStatusChange={handleStatusChange}
+              onTicketPurchased={handleTicketPurchased}
+              onEventClick={handleEventClick}
+            />
+          )}
         </section>
 
         <aside className="sold-out-panel">
@@ -212,7 +218,10 @@ function AdminManager() {
             </div>
 
             {loadingEvents ? (
-              <p className="admin-info-text">Loading sold out events...</p>
+              <div className="admin-info-text">
+                <LoadingSpinner size="small" />
+                <span style={{ marginLeft: '8px' }}>Loading sold out events...</span>
+              </div>
             ) : error ? (
               <p className="admin-error-text">{error}</p>
             ) : soldOutEvents.length === 0 ? (
