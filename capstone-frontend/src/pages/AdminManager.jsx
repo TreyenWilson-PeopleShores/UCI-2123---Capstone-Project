@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Cal from '../components/Cal';
 import EventModal from '../components/EventModal';
 import { useAuth } from '../contexts/AuthContext';
+import { getAllEventsByDateRange } from '../services/eventsService';
+import { getTicketsByEventId } from '../services/ticketsService';
 import '../styles/AdminManager.css';
 
 function AdminManager() {
@@ -43,30 +45,7 @@ function AdminManager() {
 
     try {
       const { start, end } = getMonthRange(date);
-      let allEvents = [];
-      let page = 0;
-      let hasMorePages = true;
-
-      while (hasMorePages) {
-        const response = await fetch(`/api/events/date?start=${start}&end=${end}&page=${page}`, {
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch events: ${response.statusText}`);
-        }
-
-        const responseData = await response.json();
-        const pageEvents = Array.isArray(responseData) ? responseData : responseData.content || [];
-        allEvents = [...allEvents, ...pageEvents];
-
-        hasMorePages = !responseData.last && page < (responseData.totalPages || 0) - 1;
-        page += 1;
-      }
-
+      const { events: allEvents } = await getAllEventsByDateRange(start, end);
       setEvents(allEvents);
     } catch (err) {
       setError(err.message || 'Unable to load events');
@@ -81,18 +60,7 @@ function AdminManager() {
 
     await Promise.all(eventList.map(async (event) => {
       try {
-        const response = await fetch(`/api/tickets/event/${event.id}?page=0&size=10`, {
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch ticket summary: ${response.statusText}`);
-        }
-
-        const ticketData = await response.json();
+        const ticketData = await getTicketsByEventId(event.id, { page: 0, size: 10 });
         const ticketRows = Array.isArray(ticketData) ? ticketData : ticketData.content || [];
 
         if (ticketRows.length === 0) {

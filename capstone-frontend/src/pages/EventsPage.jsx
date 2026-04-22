@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Cal from '../components/Cal';
 import UpcomingEvents from '../components/UpcomingEvents';
 import EventModal from '../components/EventModal';
+import { getAllEventsByDateRange, getEventsByDateRange } from '../services/eventsService';
 
 function EventsPage() {
   // State to store the events data for current month
@@ -42,45 +43,11 @@ function EventsPage() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const { start, end } = getMonthRange(date);
       console.log(`Fetching events for ${start} to ${end}`);
-      
-      let allEvents = [];
-      let page = 0;
-      let hasMorePages = true;
-      
-      // Fetch all pages for the month
-      while (hasMorePages) {
-        const url = `/api/events/date?start=${start}&end=${end}&page=${page}`;
-        console.log(`Fetching page ${page}: ${url}`);
-        
-        const response = await fetch(url, {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        });
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Error response:', errorText);
-          throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
-        }
-        
-        const responseData = await response.json();
-        console.log(`Page ${page} response:`, responseData);
-        
-        // Add events from this page
-        if (responseData.content && Array.isArray(responseData.content)) {
-          allEvents = [...allEvents, ...responseData.content];
-        }
-        
-        // Check if there are more pages
-        hasMorePages = !responseData.last && page < responseData.totalPages - 1;
-        page++;
-      }
-      
+
+      const { events: allEvents } = await getAllEventsByDateRange(start, end);
       console.log(`Total events for month: ${allEvents.length}`);
       setEvents(allEvents);
     } catch (err) {
@@ -152,16 +119,12 @@ function EventsPage() {
         <button onClick={() => {
           setLoading(true);
           setError(null);
-          // Re-fetch events for current month
           const { start, end } = getMonthRange(currentMonth);
-          fetch(`/api/events/date?start=${start}&end=${end}&page=0`)
-            .then(res => {
-              console.log('Manual fetch status:', res.status);
-              return res.text();
-            })
-            .then(text => {
-              console.log('Manual fetch response (first 500 chars):', text.substring(0, 500));
-              setError('Response preview: ' + text.substring(0, 200));
+          getEventsByDateRange(start, end, 0)
+            .then((responseData) => {
+              console.log('Manual fetch response:', responseData);
+              const stringified = JSON.stringify(responseData);
+              setError(`Response preview: ${stringified.substring(0, 200)}`);
               setLoading(false);
             })
             .catch(err => {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import StatusBadge from './StatusBadge';
+import { getAllEventsByDateRange } from '../services/eventsService';
 import '../styles/EventList.css';
 
 /**
@@ -37,49 +38,19 @@ const UpcomingEvents = ({ maxEvents = 5, onEventClick, events: providedEvents })
       try {
         setLoading(true);
         setError(null);
-        
-        // Since the existing API uses pagination, we need to fetch all pages
-        let allEvents = [];
-        let page = 0;
-        let hasMorePages = true;
-        
-        // Get date range for the next 6 months to ensure we get enough events
+
         const today = new Date();
         const sixMonthsFromNow = new Date();
         sixMonthsFromNow.setMonth(today.getMonth() + 6);
-        
+
         const formatDate = (date) => {
           return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         };
-        
+
         const startDate = formatDate(today);
         const endDate = formatDate(sixMonthsFromNow);
-        
-        while (hasMorePages) {
-          const url = `/api/events/date?start=${startDate}&end=${endDate}&page=${page}`;
-          
-          const response = await fetch(url, {
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            },
-          });
-          
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          
-          const responseData = await response.json();
-          
-          if (responseData.content && Array.isArray(responseData.content)) {
-            allEvents = [...allEvents, ...responseData.content];
-          }
-          
-          // Check if there are more pages
-          hasMorePages = !responseData.last && page < responseData.totalPages - 1;
-          page++;
-        }
-        
+        const { events: allEvents } = await getAllEventsByDateRange(startDate, endDate);
+
         setInternalEvents(allEvents);
       } catch (err) {
         setError(err.message || 'Failed to fetch events');

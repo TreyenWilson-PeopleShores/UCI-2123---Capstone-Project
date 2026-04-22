@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { login as loginWithApi } from '../services/authService';
 
 const AuthContext = createContext();
 
@@ -23,28 +24,7 @@ export function AuthProvider({ children }) {
   // Login: authenticate with backend
   const login = async (username, password) => {
     try {
-      const response = await fetch(
-        `/auth/login`,
-        {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ username, password }),
-        }
-      );
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Invalid username or password');
-        }
-        throw new Error('Login failed');
-      }
-
-      const user = await response.json();
-
-      // Store user with role
+      const user = await loginWithApi(username, password);
       const userWithRole = {
         username: user.username,
         role: user.role || 'USER',
