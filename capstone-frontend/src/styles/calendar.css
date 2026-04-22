@@ -37,6 +37,8 @@
   margin: 0;
   font-size: 1.35rem;
   font-weight: 700;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .nav-button {

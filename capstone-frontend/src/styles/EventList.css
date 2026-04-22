@@ -64,6 +64,7 @@
   color: #1f2937;
   margin: 0;
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .event-date {

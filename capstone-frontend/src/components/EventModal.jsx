@@ -346,6 +346,8 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased,
     <dialog 
       className="modal"
       ref={modalRef}
+      aria-modal="true"
+      aria-labelledby="modal-title"
     >
       <div className="modal-content">
         {/* Header with close button */}

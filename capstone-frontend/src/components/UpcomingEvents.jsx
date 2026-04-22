@@ -192,18 +192,12 @@ const UpcomingEvents = ({ maxEvents = 5, onEventClick, events: providedEvents })
       <h2 className="event-list-title">Upcoming Events</h2>
       <div className="event-list">
         {filteredEvents.map(event => (
-          <div 
-            key={event.id} 
+          <button
+            key={event.id}
+            type="button"
             className="event-item"
             onClick={() => onEventClick && onEventClick(event)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onEventClick && onEventClick(event);
-              }
-            }}
+            aria-label={(event.name || 'Upcoming event') + ' on ' + formatEventDate(event.date) + (event.venue ? ' at ' + getVenueName(event.venue) : '')}
           >
             <div className="event-item-header">
               <h3 className="event-name">{event.name}</h3>
@@ -217,7 +211,7 @@ const UpcomingEvents = ({ maxEvents = 5, onEventClick, events: providedEvents })
               )}
               <StatusBadge status={event.status} size="sm" />
             </div>
-          </div>
+          </button>
         ))}
       </div>
     </div>
