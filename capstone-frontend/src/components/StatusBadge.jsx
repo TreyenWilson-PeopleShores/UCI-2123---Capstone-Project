@@ -1,4 +1,5 @@
 import '../styles/StatusBadge.css';
+import PropTypes from 'prop-types';
 
 /**
  * StatusBadge Component
@@ -34,6 +35,17 @@ const StatusBadge = ({ status, className = '', size = 'md' }) => {
       {displayText}
     </span>
   );
+};
+
+StatusBadge.propTypes = {
+  status: PropTypes.oneOf(['SCHEDULED', 'COMPLETED', 'CANCELLED']),
+  className: PropTypes.string,
+  size: PropTypes.oneOf(['sm', 'md', 'lg'])
+};
+
+StatusBadge.defaultProps = {
+  className: '',
+  size: 'md'
 };
 
 export default StatusBadge;

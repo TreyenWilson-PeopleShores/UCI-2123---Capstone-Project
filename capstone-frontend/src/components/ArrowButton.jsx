@@ -1,4 +1,5 @@
 import '../styles/ArrowButton.css';
+import PropTypes from 'prop-types';
 
 /**
  * ArrowButton - A reusable arrow button component with consistent styling
@@ -33,5 +34,22 @@ function ArrowButton({
     />
   );
 }
+
+ArrowButton.propTypes = {
+  direction: PropTypes.oneOf(['left', 'right']),
+  onClick: PropTypes.func,
+  disabled: PropTypes.bool,
+  label: PropTypes.string,
+  className: PropTypes.string,
+  style: PropTypes.object
+};
+
+ArrowButton.defaultProps = {
+  direction: 'left',
+  disabled: false,
+  label: '',
+  className: '',
+  style: {}
+};
 
 export default ArrowButton;

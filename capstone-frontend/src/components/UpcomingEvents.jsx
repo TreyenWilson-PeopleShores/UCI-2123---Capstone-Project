@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import StatusBadge from './StatusBadge';
 import { getAllEventsByDateRange } from '../services/eventsService';
 import '../styles/EventList.css';
@@ -221,6 +222,16 @@ const UpcomingEvents = ({ maxEvents = 5, onEventClick, events: providedEvents })
       </div>
     </div>
   );
+};
+
+UpcomingEvents.propTypes = {
+  maxEvents: PropTypes.number,
+  onEventClick: PropTypes.func,
+  events: PropTypes.array
+};
+
+UpcomingEvents.defaultProps = {
+  maxEvents: 5
 };
 
 export default UpcomingEvents;

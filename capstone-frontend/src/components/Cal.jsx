@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import PropTypes from 'prop-types';
 import ArrowButton from './ArrowButton';
 
 function Cal({ events = [], loading = false, currentMonth: currentDate = new Date(), onMonthChange, onStatusChange, onTicketPurchased, onEventClick }) {
@@ -272,5 +273,21 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
     </section>
   );
 }
+
+Cal.propTypes = {
+  events: PropTypes.array,
+  loading: PropTypes.bool,
+  currentMonth: PropTypes.instanceOf(Date),
+  onMonthChange: PropTypes.func,
+  onStatusChange: PropTypes.func,
+  onTicketPurchased: PropTypes.func,
+  onEventClick: PropTypes.func
+};
+
+Cal.defaultProps = {
+  events: [],
+  loading: false,
+  currentMonth: new Date()
+};
 
 export default Cal;

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useAuth } from '../contexts/AuthContext';
 import StatusBadge from './StatusBadge';
 import { getVenueById } from '../services/venuesService';
@@ -480,5 +481,20 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased,
     </dialog>
   );
 }
+
+EventModal.propTypes = {
+  event: PropTypes.object,
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onStatusChange: PropTypes.func,
+  onTicketPurchased: PropTypes.func,
+  ticketsOwned: PropTypes.array
+};
+
+EventModal.defaultProps = {
+  onStatusChange: () => {},
+  onTicketPurchased: () => {},
+  ticketsOwned: []
+};
 
 export default EventModal;
