@@ -25,10 +25,23 @@ import java.util.List;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtUtil jwtUtil;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    public SecurityConfig(JwtUtil jwtUtil,
+                         CustomUserDetailsService customUserDetailsService) {
+        this.jwtUtil = jwtUtil;
+        this.customUserDetailsService = customUserDetailsService;
+    }
+
+    @Bean
+    public RateLimitFilter rateLimitFilter() {
+        return new RateLimitFilter();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtUtil, customUserDetailsService);
     }
 
     @Bean
@@ -59,7 +72,8 @@ public class SecurityConfig {
                 // Allow everything else (static resources, etc.)
                 .anyRequest().permitAll()
             )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(rateLimitFilter(), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

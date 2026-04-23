@@ -35,8 +35,12 @@ export function AuthProvider({ children }) {
       const authData = await loginWithApi(username, password);
       
       // Extract user info from response
-      // The new JWT endpoint returns { accessToken, tokenType, user: { id, username, role } }
-      const user = authData.user || authData; // Fallback to old format
+      // The JWT endpoint returns { accessToken, tokenType, user: { id, username, role } }
+      const user = authData.user;
+      if (!user) {
+        throw new Error('Invalid response from server: user data missing');
+      }
+      
       const userWithRole = {
         username: user.username,
         role: user.role || 'USER',

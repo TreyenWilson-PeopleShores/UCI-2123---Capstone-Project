@@ -21,12 +21,20 @@ public class AuthService {
     }
 
     public UserResponse authenticate(String username, String password) {
-        User user = userRepository.findByUsername(username)
+        // Trim and sanitize inputs
+        String trimmedUsername = username != null ? username.trim() : "";
+        String trimmedPassword = password != null ? password.trim() : "";
+        
+        if (trimmedUsername.isEmpty() || trimmedPassword.isEmpty()) {
+            throw new RuntimeException("Invalid username or password");
+        }
+        
+        User user = userRepository.findByUsername(trimmedUsername)
                 .orElseThrow(() -> new RuntimeException("Invalid username or password"));
 
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            if (password.equals(user.getPassword())) {
-                user.setPassword(passwordEncoder.encode(password));
+        if (!passwordEncoder.matches(trimmedPassword, user.getPassword())) {
+            if (trimmedPassword.equals(user.getPassword())) {
+                user.setPassword(passwordEncoder.encode(trimmedPassword));
                 userRepository.save(user);
             } else {
                 throw new RuntimeException("Invalid username or password");
@@ -37,10 +45,19 @@ public class AuthService {
     }
 
     public User register(String username, String password, String role) {
-        String normalizedRole = normalizeRole(role);
+        // Trim and sanitize inputs
+        String trimmedUsername = username != null ? username.trim() : "";
+        String trimmedPassword = password != null ? password.trim() : "";
+        String trimmedRole = role != null ? role.trim() : "";
+        
+        if (trimmedUsername.isEmpty() || trimmedPassword.isEmpty()) {
+            throw new RuntimeException("Username and password are required");
+        }
+        
+        String normalizedRole = normalizeRole(trimmedRole);
         User user = new User();
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password));
+        user.setUsername(trimmedUsername);
+        user.setPassword(passwordEncoder.encode(trimmedPassword));
         user.setRole(normalizedRole);
         return userRepository.save(user);
     }
