@@ -21,7 +21,9 @@ public class RateLimitFilter extends OncePerRequestFilter implements Ordered {
     @Value("${rate.limit.auth.requests:10}")
     private int authRequestsPerMinute;
 
-    @Value("${rate.limit.api.requests:100}")
+    // Increased from 100 to 600 to accommodate admin calendar UI usage
+    // Admin calendar browsing triggers multiple rapid GET requests for events, venues, tickets, etc.
+    @Value("${rate.limit.api.requests:600}")
     private int apiRequestsPerMinute;
 
     private static class RequestCounter {
