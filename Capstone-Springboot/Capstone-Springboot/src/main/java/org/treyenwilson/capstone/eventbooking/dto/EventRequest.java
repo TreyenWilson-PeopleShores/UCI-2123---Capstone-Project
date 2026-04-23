@@ -5,18 +5,25 @@ import java.time.LocalDate;
 
 public class EventRequest {
     @NotBlank(message = "You must provide a name for the event")
+    @jakarta.validation.constraints.Size(max = 200, message = "Event name must not exceed 200 characters")
     private String event_name;
 
     @NotNull(message = "You must provide a date")
     private LocalDate date;
 
     @NotBlank(message = "You must provide a status")
+    @jakarta.validation.constraints.Pattern(
+        regexp = "^(scheduled|cancelled|completed)$",
+        flags = jakarta.validation.constraints.Pattern.Flag.CASE_INSENSITIVE,
+        message = "Status must be one of: scheduled, cancelled, completed")
     private String status;
 
     @NotNull(message = "Total spots must be more then 0")
+    @jakarta.validation.constraints.Positive(message = "Total spots must be a positive number")
     private Long total_spots;
 
     @NotNull(message = "You must provide an id from the venue")
+    @jakarta.validation.constraints.Positive(message = "Venue ID must be a positive number")
     private Long venue_id;
 
     public EventRequest() {}

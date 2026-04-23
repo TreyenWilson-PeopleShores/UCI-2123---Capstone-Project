@@ -1,5 +1,6 @@
 package org.treyenwilson.capstone.eventbooking.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
         try {
             UserResponse user = authService.authenticate(loginRequest.getUsername(), loginRequest.getPassword());
             // Also generate JWT token for backward compatibility

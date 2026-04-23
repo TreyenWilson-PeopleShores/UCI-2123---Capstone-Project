@@ -5,15 +5,19 @@ import jakarta.validation.constraints.*;
 public class TicketRequest {
 
     @NotNull(message = "Event ID is required")
+    @jakarta.validation.constraints.Positive(message = "Event ID must be a positive number")
     private Long event_id;
 
     @NotNull(message = "Price must be provided")
+    @jakarta.validation.constraints.DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
     private Double price;
 
     @NotNull(message = "Total quantity must be provided")
+    @jakarta.validation.constraints.Positive(message = "Total quantity must be a positive number")
     private Long total_quantity;
 
     @NotNull(message = "Sold quantity must be provided")
+    @jakarta.validation.constraints.PositiveOrZero(message = "Sold quantity must be zero or positive")
     private Long sold;
 
     //getters and setters below

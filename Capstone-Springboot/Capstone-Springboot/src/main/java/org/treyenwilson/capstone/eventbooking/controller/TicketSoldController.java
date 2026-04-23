@@ -13,12 +13,17 @@ import org.treyenwilson.capstone.eventbooking.security.SecurityUtil;
 import org.treyenwilson.capstone.eventbooking.dto.TicketSoldResponse;
 import org.treyenwilson.capstone.eventbooking.entity.TicketSold;
 import org.treyenwilson.capstone.eventbooking.service.TicketSoldService;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/tickets-sold")
 public class TicketSoldController {
     private final TicketSoldService ticketSoldService;
     private final SecurityUtil securityUtil;
+
+    /** Whitelist of field names accepted for ORDER BY to prevent ORDER BY injection. */
+    private static final Set<String> ALLOWED_SORT_FIELDS =
+            Set.of("id", "userId", "ticketId", "dateSold");
 
     public TicketSoldController(TicketSoldService ticketSoldService, SecurityUtil securityUtil) {
         this.ticketSoldService = ticketSoldService;
@@ -55,34 +60,18 @@ public class TicketSoldController {
             @RequestParam(required = false) Integer month,
             @RequestParam(required = false) Integer year) {
 
-        try {
-            // Map common property names to actual entity field names
-            String mappedSortBy = sortBy;
-            if ("user_id".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "userId";
-            } else if ("ticket_id".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "ticketId";
-            } else if ("date_sold".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "dateSold";
-            }
+        String resolvedSort = resolveSortField(sortBy);
+        Sort sort = ascending ? Sort.by(resolvedSort).ascending() : Sort.by(resolvedSort).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-            Sort sort = ascending ? Sort.by(mappedSortBy).ascending() : Sort.by(mappedSortBy).descending();
-            Pageable pageable = PageRequest.of(page, size, sort);
-            
-            // Handle search by month and/or year
-            if (month != null && year != null) {
-                return ticketSoldService.findByMonthAndYear(month, year, pageable);
-            } else if (month != null) {
-                return ticketSoldService.findByMonth(month, pageable);
-            } else if (year != null) {
-                return ticketSoldService.findByYear(year, pageable);
-            } else {
-                return ticketSoldService.findAll(pageable);
-            }
-        } catch (Exception e) {
-            // Fallback to default sorting if there's an issue with the provided sortBy parameter
-            Sort sort = Sort.by("id").ascending();
-            Pageable pageable = PageRequest.of(page, size, sort);
+        // Handle search by month and/or year
+        if (month != null && year != null) {
+            return ticketSoldService.findByMonthAndYear(month, year, pageable);
+        } else if (month != null) {
+            return ticketSoldService.findByMonth(month, pageable);
+        } else if (year != null) {
+            return ticketSoldService.findByYear(year, pageable);
+        } else {
             return ticketSoldService.findAll(pageable);
         }
     }
@@ -97,26 +86,22 @@ public class TicketSoldController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "true") boolean ascending) {
 
-        try {
-            // Map common property names to actual entity field names
-            String mappedSortBy = sortBy;
-            if ("user_id".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "userId";
-            } else if ("ticket_id".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "ticketId";
-            } else if ("date_sold".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "dateSold";
-            }
+        String resolvedSort = resolveSortField(sortBy);
+        Sort sort = ascending ? Sort.by(resolvedSort).ascending() : Sort.by(resolvedSort).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return ticketSoldService.findByUserId(userId, pageable);
+    }
 
-            Sort sort = ascending ? Sort.by(mappedSortBy).ascending() : Sort.by(mappedSortBy).descending();
-            Pageable pageable = PageRequest.of(page, size, sort);
-            
-            return ticketSoldService.findByUserId(userId, pageable);
-        } catch (Exception e) {
-            // Fallback to default sorting if there's an issue with the provided sortBy parameter
-            Sort sort = Sort.by("id").ascending();
-            Pageable pageable = PageRequest.of(page, size, sort);
-            return ticketSoldService.findByUserId(userId, pageable);
-        }
+    /**
+     * Resolves a user-supplied sort field name to a whitelisted entity field name.
+     * Falls back to "id" if the supplied value is not in the allowed set,
+     * preventing ORDER BY injection via unvalidated sort parameters.
+     */
+    private String resolveSortField(String sortBy) {
+        String mapped = sortBy;
+        if ("user_id".equalsIgnoreCase(sortBy))    mapped = "userId";
+        else if ("ticket_id".equalsIgnoreCase(sortBy)) mapped = "ticketId";
+        else if ("date_sold".equalsIgnoreCase(sortBy))  mapped = "dateSold";
+        return ALLOWED_SORT_FIELDS.contains(mapped) ? mapped : "id";
     }
 }
