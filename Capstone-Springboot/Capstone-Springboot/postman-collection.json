@@ -133,7 +133,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userId\": 1,\n  \"ticketId\": 1,\n  \"quantity\": 2,\n  \"totalPrice\": 50.00\n}"
+              "raw": "{\n  \"user_id\": 1,\n  \"ticket_id\": 1,\n  \"date_sold\": \"2026-04-24\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/tickets-sold",
