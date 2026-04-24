@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -41,12 +42,7 @@ public class VenueControllerTest {
 
     @MockitoBean
     private VenueService venueService;
-static class TestConfig {
-    @Bean
-    EventService eventService() {
-        return Mockito.mock(EventService.class);
-    }
-}
+
     @Test
     public void testGetVenueById_Success() throws Exception {
         // Arrange
@@ -140,5 +136,143 @@ static class TestConfig {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(1L))
                 .andExpect(jsonPath("$.content[0].venue_name").value("Test Venue"));
+    }
+
+    @Test
+    public void testGetAllVenues_WithCityFilter_Success() throws Exception {
+        // Arrange
+        Venue venue = new Venue();
+        venue.setId(1L);
+        venue.setVenue_name("Test Venue");
+        venue.setLocation("Los Angeles, CA");
+        venue.setTotal_capacity(100L);
+
+        Page<Venue> page = new PageImpl<>(List.of(venue), PageRequest.of(0, 10), 1);
+        when(venueService.findByCity(eq("Los Angeles"), any(Pageable.class))).thenReturn(page);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/venues")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortBy", "id")
+                        .param("ascending", "true")
+                        .param("city", "Los Angeles"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(1L))
+                .andExpect(jsonPath("$.content[0].venue_name").value("Test Venue"));
+    }
+
+    @Test
+    public void testGetAllVenues_WithStateFilter_Success() throws Exception {
+        // Arrange
+        Venue venue = new Venue();
+        venue.setId(1L);
+        venue.setVenue_name("Test Venue");
+        venue.setLocation("Los Angeles, CA");
+        venue.setTotal_capacity(100L);
+
+        Page<Venue> page = new PageImpl<>(List.of(venue), PageRequest.of(0, 10), 1);
+        when(venueService.findByState(eq("CA"), any(Pageable.class))).thenReturn(page);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/venues")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortBy", "id")
+                        .param("ascending", "true")
+                        .param("state", "CA"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(1L))
+                .andExpect(jsonPath("$.content[0].venue_name").value("Test Venue"));
+    }
+
+    @Test
+    public void testGetAllVenues_InvalidSortBy_FallsBackToId() throws Exception {
+        // Arrange
+        Venue venue = new Venue();
+        venue.setId(1L);
+        venue.setVenue_name("Test Venue");
+        venue.setLocation("Test Location");
+        venue.setTotal_capacity(100L);
+
+        Page<Venue> page = new PageImpl<>(List.of(venue), PageRequest.of(0, 10, Sort.by("id").ascending()), 1);
+        when(venueService.findAll(any(Pageable.class))).thenReturn(page);
+
+        // Act & Assert - Test with invalid sortBy field
+        mockMvc.perform(get("/api/venues")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortBy", "invalid_field") // Should fall back to "id"
+                        .param("ascending", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(1L));
+    }
+
+    @Test
+    public void testGetAllVenues_ValidSortByMapping_Success() throws Exception {
+        // Arrange
+        Venue venue = new Venue();
+        venue.setId(1L);
+        venue.setVenue_name("Test Venue");
+        venue.setLocation("Test Location");
+        venue.setTotal_capacity(100L);
+
+        Page<Venue> page = new PageImpl<>(List.of(venue), PageRequest.of(0, 10, Sort.by("venue_name").ascending()), 1);
+        when(venueService.findAll(any(Pageable.class))).thenReturn(page);
+
+        // Act & Assert - Test with camelCase field name that should map to snake_case
+        mockMvc.perform(get("/api/venues")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortBy", "venueName") // Should map to "venue_name"
+                        .param("ascending", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(1L));
+    }
+
+    @Test
+    public void testGetByVenueLocation_InvalidSortBy_FallsBackToId() throws Exception {
+        // Arrange
+        String location = "Los Angeles";
+        Venue venue = new Venue();
+        venue.setId(1L);
+        venue.setVenue_name("Test Venue");
+        venue.setLocation(location);
+        venue.setTotal_capacity(100L);
+
+        Page<Venue> page = new PageImpl<>(List.of(venue), PageRequest.of(0, 10, Sort.by("id").ascending()), 1);
+        when(venueService.findByLocation(any(Pageable.class), eq(location))).thenReturn(page);
+
+        // Act & Assert - Test with invalid sortBy field
+        mockMvc.perform(get("/api/venues/location/{location}", location)
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortBy", "invalid_field") // Should fall back to "id"
+                        .param("ascending", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(1L));
+    }
+
+    @Test
+    public void testGetByVenueLocation_ValidSortByMapping_Success() throws Exception {
+        // Arrange
+        String location = "Los Angeles";
+        Venue venue = new Venue();
+        venue.setId(1L);
+        venue.setVenue_name("Test Venue");
+        venue.setLocation(location);
+        venue.setTotal_capacity(100L);
+
+        Page<Venue> page = new PageImpl<>(List.of(venue), PageRequest.of(0, 10, Sort.by("total_capacity").ascending()), 1);
+        when(venueService.findByLocation(any(Pageable.class), eq(location))).thenReturn(page);
+
+        // Act & Assert - Test with camelCase field name that should map to snake_case
+        mockMvc.perform(get("/api/venues/location/{location}", location)
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortBy", "totalCapacity") // Should map to "total_capacity"
+                        .param("ascending", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(1L));
     }
 }

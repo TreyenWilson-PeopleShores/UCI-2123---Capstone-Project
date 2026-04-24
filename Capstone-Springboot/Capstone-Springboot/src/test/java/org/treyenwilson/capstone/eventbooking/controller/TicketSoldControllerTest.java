@@ -42,13 +42,7 @@ public class TicketSoldControllerTest {
 
     @MockitoBean
     private TicketSoldService ticketSoldService;
-@TestConfiguration
-static class TestConfig {
-    @Bean
-    EventService eventService() {
-        return Mockito.mock(EventService.class);
-    }
-}
+
     @Test
     @WithMockUser(roles = "ADMIN")
     public void testGetTicketSoldById_Success() throws Exception {

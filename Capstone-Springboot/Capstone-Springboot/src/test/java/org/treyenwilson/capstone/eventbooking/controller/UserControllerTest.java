@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -41,12 +42,7 @@ public class UserControllerTest {
 
     @MockitoBean
     private UserService userService;
-static class TestConfig {
-    @Bean
-    EventService eventService() {
-        return Mockito.mock(EventService.class);
-    }
-}
+
     @Test
     public void testGetUserById_Success() throws Exception {
         // Arrange
@@ -142,5 +138,74 @@ static class TestConfig {
                 .andExpect(jsonPath("$.content[0].id").value(1L))
                 .andExpect(jsonPath("$.content[0].username").value("testuser"))
                 .andExpect(jsonPath("$.content[0].role").value("USER"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void testGetAllUsers_InvalidSortBy_FallsBackToId() throws Exception {
+        // Arrange
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("testuser");
+        user.setPassword("password123");
+        user.setRole("USER");
+
+        Page<User> page = new PageImpl<>(List.of(user), PageRequest.of(0, 10, Sort.by("id").ascending()), 1);
+        when(userService.findAll(any(Pageable.class))).thenReturn(page);
+
+        // Act & Assert - Test with invalid sortBy field
+        mockMvc.perform(get("/api/users")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortBy", "invalid_field") // Should fall back to "id"
+                        .param("ascending", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(1L));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void testGetAllUsers_ValidSortByLowerCase_Success() throws Exception {
+        // Arrange
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("testuser");
+        user.setPassword("password123");
+        user.setRole("USER");
+
+        Page<User> page = new PageImpl<>(List.of(user), PageRequest.of(0, 10, Sort.by("username").ascending()), 1);
+        when(userService.findAll(any(Pageable.class))).thenReturn(page);
+
+        // Act & Assert - Test with lowercase field name
+        mockMvc.perform(get("/api/users")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortBy", "username") // Should be accepted
+                        .param("ascending", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(1L));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void testGetAllUsers_ValidSortByUpperCase_Success() throws Exception {
+        // Arrange
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("testuser");
+        user.setPassword("password123");
+        user.setRole("USER");
+
+        Page<User> page = new PageImpl<>(List.of(user), PageRequest.of(0, 10, Sort.by("role").ascending()), 1);
+        when(userService.findAll(any(Pageable.class))).thenReturn(page);
+
+        // Act & Assert - Test with uppercase field name (should be lowercased)
+        mockMvc.perform(get("/api/users")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortBy", "ROLE") // Should be lowercased to "role"
+                        .param("ascending", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(1L));
     }
 }
