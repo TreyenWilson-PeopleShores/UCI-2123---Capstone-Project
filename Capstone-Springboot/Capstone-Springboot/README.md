@@ -34,6 +34,8 @@ The backend is protected against SQL injection through multiple layers:
 
 ## API Documentation
 
+**Complete API Documentation**: See `../../API-Documentation-V4.md` for 100% verified documentation of all 29 endpoints.
+
 ### Authentication
 - `POST /api/auth/login` - Login with username/password, returns JWT token
 - `POST /api/auth/register` - Register new user, returns JWT token
