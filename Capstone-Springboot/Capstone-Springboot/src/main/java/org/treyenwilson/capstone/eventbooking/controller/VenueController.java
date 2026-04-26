@@ -11,11 +11,16 @@ import org.treyenwilson.capstone.eventbooking.dto.VenueRequest;
 import org.treyenwilson.capstone.eventbooking.dto.VenueResponse;
 import org.treyenwilson.capstone.eventbooking.entity.Venue;
 import org.treyenwilson.capstone.eventbooking.service.VenueService;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/venues")
 public class VenueController {
     private final VenueService venueService;
+
+    /** Whitelist of field names accepted for ORDER BY to prevent ORDER BY injection. */
+    private static final Set<String> ALLOWED_SORT_FIELDS =
+            Set.of("id", "venue_name", "location", "total_capacity");
 
     public VenueController(VenueService venueService) {
         this.venueService = venueService;
@@ -51,37 +56,16 @@ public class VenueController {
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String state) {
 
-        try {
-            // Map common property names to actual entity field names
-            String mappedSortBy = sortBy;
-            if ("venueName".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "venue_name";
-            } else if ("totalCapacity".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "total_capacity";
-            }
-            
-            Sort sort = ascending ? Sort.by(mappedSortBy).ascending() : Sort.by(mappedSortBy).descending();
-            Pageable pageable = PageRequest.of(page, size, sort);
+        String resolvedSort = resolveSortField(sortBy);
+        Sort sort = ascending ? Sort.by(resolvedSort).ascending() : Sort.by(resolvedSort).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-            if (city != null && !city.isEmpty()) {
-                return venueService.findByCity(city, pageable);
-            } else if (state != null && !state.isEmpty()) {
-                return venueService.findByState(state, pageable);
-            } else {
-                return venueService.findAll(pageable);
-            }
-        } catch (Exception e) {
-            // Fallback to default sorting if there's an issue with the provided sortBy parameter
-            Sort sort = Sort.by("id").ascending();
-            Pageable pageable = PageRequest.of(page, size, sort);
-            
-            if (city != null && !city.isEmpty()) {
-                return venueService.findByCity(city, pageable);
-            } else if (state != null && !state.isEmpty()) {
-                return venueService.findByState(state, pageable);
-            } else {
-                return venueService.findAll(pageable);
-            }
+        if (city != null && !city.isEmpty()) {
+            return venueService.findByCity(city, pageable);
+        } else if (state != null && !state.isEmpty()) {
+            return venueService.findByState(state, pageable);
+        } else {
+            return venueService.findAll(pageable);
         }
     }
 
@@ -94,24 +78,22 @@ public class VenueController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "true") boolean ascending) {
 
-        try {
-            // Map common property names to actual entity field names
-            String mappedSortBy = sortBy;
-            if ("venueName".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "venue_name";
-            } else if ("totalCapacity".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "total_capacity";
-            }
-            
-            Sort sort = ascending ? Sort.by(mappedSortBy).ascending() : Sort.by(mappedSortBy).descending();
-            Pageable pageable = PageRequest.of(page, size, sort);
-            return venueService.findByLocation(pageable, location);
-        } catch (Exception e) {
-            // Fallback to default sorting if there's an issue with the provided sortBy parameter
-            Sort sort = Sort.by("id").ascending();
-            Pageable pageable = PageRequest.of(page, size, sort);
-            return venueService.findByLocation(pageable, location);
-        }
+        String resolvedSort = resolveSortField(sortBy);
+        Sort sort = ascending ? Sort.by(resolvedSort).ascending() : Sort.by(resolvedSort).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return venueService.findByLocation(pageable, location);
+    }
+
+    /**
+     * Resolves a user-supplied sort field name to a whitelisted entity field name.
+     * Falls back to "id" if the supplied value is not in the allowed set,
+     * preventing ORDER BY injection via unvalidated sort parameters.
+     */
+    private String resolveSortField(String sortBy) {
+        String mapped = sortBy;
+        if ("venueName".equalsIgnoreCase(sortBy))       mapped = "venue_name";
+        else if ("totalCapacity".equalsIgnoreCase(sortBy)) mapped = "total_capacity";
+        return ALLOWED_SORT_FIELDS.contains(mapped) ? mapped : "id";
     }
 
 }

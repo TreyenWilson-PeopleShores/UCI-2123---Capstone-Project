@@ -1,0 +1,333 @@
+UCI 2123: Systems Engineering with AWS
+Capstone Project
+Introduction
+The Capstone Project represents the culmination of your learning journey in the Systems Engineering with AWS course. Over the past 15 weeks, you have developed expertise across the full stack of modern web development, from foundational HTML, CSS, and JavaScript to backend Java services with Spring Boot, relational databases with SQL, and cloud deployment on AWS.
+
+This project challenges you to synthesize all of these skills into a cohesive, production-grade application that demonstrates your readiness for future development roles. You will work independently to design, implement, test, deploy, and present a complete solution that addresses a real-world business problem.
+
+The Capstone spans 7 class days and requires you to demonstrate technical proficiency, problem-solving ability, professional communication, and project management skills.
+
+________________________________________
+Project Objective
+Design, develop, and deploy a full-stack web application that solves a meaningful business problem, demonstrating mastery of web development principles and AWS cloud deployment.
+Learning Outcomes Assessed
+Upon completion of this Capstone, you will have demonstrated the ability to:
+
+1.	Design end-to-end web architectures integrating React front ends, Spring Boot APIs, and relational databases
+2.	Implement robust data models, validation, and RESTful services using Java, SQL, and JPA/Hibernate
+3.	Secure applications and infrastructure with authentication, authorization, and secrets management
+4.	Automate build, test, and deployment workflows with CI/CD
+5.	Deploy observable, reliable, and cost-aware cloud applications on AWS
+6.	Apply AI tools responsibly to enhance development productivity
+7.	Communicate technical decisions and business impact to stakeholders
+
+________________________________________
+Project Timeline: 7-Day Sprint Schedule
+Day	Phase	Activities	Associated Deliverables
+1	Planning & Design	Problem definition, requirements gathering, architecture design, database schema design	Project Proposal, Architecture Diagram, ERD
+2	Backend Development I	Database setup, entity modeling with JPA/Hibernate, repository layer implementation	Database schema, Entity classes, Repository interfaces
+3	Backend Development II	REST API development with Spring Boot, service layer logic, input validation, error handling	REST endpoints, Service classes, Unit tests
+4	Frontend Development	React application scaffolding, component architecture, API integration, routing	React components, API integration, Basic UI
+5	Security & Testing	Spring Security implementation, authentication/authorization, comprehensive testing (unit + integration)	Secured endpoints, Test suite, Code coverage report
+6	AWS Deployment & CI/CD	AWS CodePipeline configuration, AWS deployment (EC2, RDS, S3), monitoring setup	Deployed application, CI/CD pipeline, CloudWatch dashboards
+7	Presentation & Documentation	Final documentation, presentation preparation, code cleanup, peer review	Final presentation, Technical documentation, Source code
+Project Efficiency
+As in the workplace, you are expected to utilize previous work and AI tools to accomplish these goals in a timely manner. Without leveraging previous experiences and the tools available to you, you will find this timeline to be exceedingly difficult to meet.
+
+While class time has been allotted for work on this project, you may utilize time outside of class as well.
+
+________________________________________
+Instructions
+Phase 1: Planning & Design (Day 1)
+1.1 Problem Definition
+Select ONE of the following project options or propose your own (subject to instructor approval):
+
+A.	Inventory Management System Build a system for a small business to track products, suppliers, and stock levels. Features include product CRUD operations, low-stock alerts, supplier management, and sales reporting.
+B.	Employee Management Portal Create an HR portal for managing employee records, departments, leave requests, and performance reviews. Features include employee profiles, organizational hierarchy, and leave approval workflows.
+C.	Event Booking Platform Develop a platform for creating and booking events. Features include event creation, attendee registration, ticket management, and event analytics.
+D.	Custom Project (Instructor Approval Required) Propose your own project idea that demonstrates similar complexity and covers all required technologies.
+1.2 Requirements Documentation
+Create a Project Proposal Document that includes:
+
+●	Problem statement and business justification
+●	Target users and user stories (minimum 8 user stories)
+●	Functional requirements (minimum 10)
+●	Non-functional requirements (performance, security, scalability)
+●	Out-of-scope items
+1.3 Architecture Design
+Produce the following artifacts:
+
+●	System Architecture Diagram showing all components and their interactions
+●	Entity-Relationship Diagram (ERD) with all tables, attributes, and relationships
+●	API Design Document listing all endpoints with HTTP methods, paths, request/response schemas
+●	Component Diagram for React frontend structure
+1.4 Project Setup
+●	Initialize Git repository with:
+○	Proper .gitignore files
+○	Branch protection rules
+○	README with project overview
+
+________________________________________
+Phase 2: Backend Development (Days 2-3)
+2.1 Database Implementation
+●	Create MySQL database schema using SQL scripts
+●	Implement proper constraints (PRIMARY KEY, FOREIGN KEY, NOT NULL, UNIQUE)
+●	Add indexes for frequently queried columns
+●	Create seed data script for testing
+2.2 Entity Layer
+●	Create JPA entity classes for all tables
+●	Configure relationships (@OneToMany, @ManyToOne, @ManyToMany)
+●	Implement proper cascading and fetch strategies
+●	Add validation annotations (@NotNull, @Size, @Email, etc.)
+2.3 Repository Layer
+●	Create Spring Data JPA repository interfaces
+●	Implement custom query methods using @Query annotation
+●	Add pagination support for list endpoints
+2.4 Service Layer
+●	Implement business logic in service classes
+●	Use constructor injection for dependencies
+●	Handle exceptions with custom exception classes
+●	Implement transaction management with @Transactional
+2.5 Controller Layer
+●	Create REST controllers with appropriate mappings
+●	Implement proper HTTP status codes
+●	Add request validation with @Valid
+●	Document endpoints with annotations
+2.6 Error Handling
+●	Create global exception handler with @ControllerAdvice
+●	Return consistent error response format
+●	Log errors appropriately
+
+________________________________________
+Phase 3: Frontend Development (Day 4)
+3.1 React Application Setup
+●	Initialize React project with Vite
+●	Configure TypeScript (optional but recommended)
+●	Set up folder structure (components, pages, services, utils)
+●	Configure environment variables for API endpoints
+3.2 Component Architecture
+●	Create reusable UI components (Button, Input, Card, Modal, Table)
+●	Implement page components for each major feature
+●	Use React Router for navigation (minimum 5 routes)
+●	Implement proper prop typing
+3.3 State Management
+●	Use useState and useEffect appropriately
+●	Implement useContext for global state (user authentication, theme)
+●	Use useReducer for complex state logic
+●	Implement useMemo and useCallback for performance optimization
+3.4 API Integration
+●	Create service modules for API calls using fetch or axios
+●	Implement proper error handling for failed requests
+●	Add loading states for async operations
+●	Handle authentication tokens in requests
+3.5 UI/UX Requirements
+●	Implement responsive design (mobile, tablet, desktop)
+●	Add form validation with user-friendly error messages
+●	Include loading spinners and skeleton screens
+●	Ensure accessibility compliance (ARIA labels, keyboard navigation)
+
+________________________________________
+Phase 4: Security & Testing (Day 5)
+4.1 Authentication & Authorization
+●	Implement JWT-based authentication
+●	Configure Spring Security filters
+●	Create login and registration endpoints
+●	Implement role-based access control (minimum 2 roles: USER, ADMIN)
+●	Secure sensitive endpoints with proper authorization
+4.2 Security Best Practices
+●	Hash passwords using BCrypt
+●	Store secrets in SSM Parameter Store (not in code)
+●	Implement CORS configuration
+●	Add rate limiting for authentication endpoints
+●	Validate and sanitize all user inputs
+4.3 Unit Testing
+●	Write JUnit tests for all service methods
+●	Test both success and failure scenarios
+●	Achieve minimum 70% code coverage
+4.4 Integration Testing
+●	Test REST endpoints with Postman
+●	Verify request/response formats
+●	Test authentication and authorization
+●	Create Postman collection with all endpoints
+4.5 Code Quality
+●	Run SonarQube analysis
+●	Address critical and major issues
+●	Ensure no security vulnerabilities
+●	Document code with meaningful comments
+
+________________________________________
+Phase 5: AWS Deployment & CI/CD (Day 6)
+5.1 Infrastructure
+Create configurations for:
+
+●	VPC with public and private subnets
+●	Security groups with least-privilege rules
+●	EC2 instance for Spring Boot application
+●	RDS MySQL instance in private subnet
+●	S3 bucket for React frontend
+●	IAM roles and policies
+●	SSM Parameter Store entries for secrets
+5.2 CI/CD Pipeline
+Configure AWS CodePipeline with stages:
+
+1.	Checkout - Pull code from GitHub
+2.	Build - Compile Java code with Maven
+3.	Test - Run unit tests
+4.	Code Analysis - Run SonarQube scan
+5.	Package - Create JAR/WAR artifact
+6.	Deploy Backend - Deploy to EC2
+7.	Build Frontend - Build React application
+8.	Deploy Frontend - Deploy to S3
+5.3 AWS Deployment
+●	Deploy Spring Boot application to EC2
+●	Configure application to connect to RDS
+●	Deploy React build to S3 with static hosting
+●	Configure CORS and security headers
+●	Verify end-to-end functionality
+5.4 Monitoring & Observability
+●	Configure CloudWatch Logs for application logs
+●	Create CloudWatch metrics dashboard
+●	Set up alarms for critical metrics (CPU, memory, errors)
+●	Configure AWS Budgets with spending alerts
+5.5 Documentation
+●	Document all AWS resources created
+●	Create architecture diagram of deployed infrastructure
+●	Document deployment process and rollback procedures
+●	Record all IAM policies and their justifications
+
+________________________________________
+Phase 6: Presentation & Documentation (Day 7)
+6.1 Technical Documentation
+Prepare comprehensive documentation including:
+
+●	README.md with setup instructions
+●	API documentation
+●	Database documentation with ERD
+●	Deployment guide with step-by-step instructions
+●	Architecture decision records for key decisions
+6.2 Presentation Preparation
+Create a 5-10 minute presentation covering:
+
+1.	Problem & Solution (1 min) - Business problem and your solution
+2.	Architecture Overview (2 min) - System design and technology choices
+3.	Live Demo (3 min) - Demonstrate key features
+4.	Technical Deep Dive (2 min) - Highlight interesting technical challenges and solutions
+5.	AWS Infrastructure (1 min) - Show deployed resources and IaC
+6.	Lessons Learned (1 min) - Challenges faced and how you overcame them
+6.3 Peer Review
+●	Participate in code review with 2 peers
+●	Provide constructive feedback on peer projects
+●	Incorporate feedback from peer reviews into your project
+6.4 Final Submission
+●	Ensure all code is committed and pushed
+●	Verify deployed application is accessible
+●	Submit all documentation
+●	Complete self-assessment
+
+________________________________________
+Deliverables
+Required Deliverables Checklist
+Planning & Design
+	Project Proposal Document
+	System Architecture Diagram
+	Entity-Relationship Diagram (ERD)
+	API Design Document
+Source Code
+	Spring Boot backend application
+	React frontend application
+	SQL database scripts
+	CodePipeline configuration
+Testing
+	JUnit test suite (70%+ coverage)
+	Postman collection
+	SonarQube report
+Documentation
+	README.md with setup instructions
+	API documentation
+	Deployment guide
+	Architecture decision records
+Deployment
+	Deployed application on AWS (accessible URL)
+	Working CI/CD pipeline
+	CloudWatch monitoring dashboard
+Presentation
+	Presentation slides
+	Peer review feedback (given and received)
+
+________________________________________
+Evaluation Rubric
+Total Points: 100
+Category 1: Planning & Architecture (15 points)
+Criteria	Excellent (5)	Proficient (4)	Satisfactory (3)	Needs Work (2)	Incomplete (0-1)
+Problem Definition & Requirements	The problem is clearly defined with comprehensive user stories (10+), functional and non-functional requirements. Business justification is compelling.	The problem is well-defined with adequate user stories (8-9), requirements cover most scenarios.	The problem is defined but user stories (6-7) or requirements are incomplete.	Problem statement is vague, minimal user stories (<6), missing requirements.	No problem definition or requirements documented.
+System Architecture Design	The architecture diagram is complete, showing all components, data flows, and technology choices with clear justifications.	The architecture diagram covers main components with most integrations shown.	The architecture diagram exists but missing key components or unclear flows.	The architecture diagram is incomplete or unclear.	No architecture diagram provided.
+Database Design (ERD)	ERD shows 4+ properly normalized tables with all relationships, cardinality, and constraints clearly documented.	ERD shows 4+ tables with relationships defined, minor normalization issues.	ERD shows 3 tables or has normalization issues, some relationships unclear.	ERD shows fewer than 3 tables or significant design flaws.	No ERD provided.
+
+Category 2: Backend Development (25 points)
+Criteria	Excellent (5)	Proficient (4)	Satisfactory (3)	Needs Work (2)	Incomplete (0-1)
+Entity & Repository Layer	All entities properly mapped with JPA annotations, relationships correctly configured, custom queries implemented efficiently.	Entities mapped correctly, relationships work, basic queries implemented.	Some entity mapping issues, relationships mostly work, limited custom queries.	Significant entity mapping problems, broken relationships.	Entities not implemented or non-functional.
+Service Layer & Business Logic	Business logic is well-organized, follows SOLID principles, proper transaction management, and comprehensive error handling.	Business logic works correctly, reasonable organization, handles main error cases.	Business logic functional but poorly organized, limited error handling.	Business logic has bugs, poor organization, and minimal error handling.	Service layer not implemented.
+REST API Implementation	RESTful endpoints follow best practices, proper HTTP methods/status codes, comprehensive validation, OpenAPI documentation.	REST endpoints work correctly, appropriate status codes, basic validation.	REST endpoints functional but inconsistent conventions, limited validation.	REST endpoints have issues, incorrect HTTP methods/status codes.	REST API not implemented.
+Java Code Quality	Code follows Java conventions, clean and readable, proper use of OOP principles, no code smells.	Code is readable and follows conventions, minor issues.	Code works but has style inconsistencies, some code smells.	Code is difficult to read, significant style issues.	Code is non-functional or missing.
+Database Implementation	Schema is properly normalized, includes constraints, indexes, seed data, and migration scripts.	Schema works correctly with appropriate constraints, basic seed data.	Schema functional but missing indexes or some constraints.	Schema has significant issues, missing constraints.	Database not implemented.
+
+Category 3: Frontend Development (20 points)
+Criteria	Excellent (5)	Proficient (4)	Satisfactory (3)	Needs Work (2)	Incomplete (0-1)
+React Component Architecture	Components are well-organized, reusable, properly typed, follow React best practices and hook patterns.	Components work correctly, reasonable organization, proper use of hooks.	Components functional but could be more reusable, some hooks misuse.	Component structure is poor, significant issues with React patterns.	Frontend not implemented.
+State Management & API Integration	State managed efficiently with appropriate hooks, API calls well-organized, proper loading/error states.	State management works, API calls functional, basic loading states.	State management issues, API integration works but error handling lacking.	Significant state management problems, API integration buggy.	State management not implemented.
+UI/UX & Responsiveness	Beautiful, polished UI that is fully responsive, accessible, with smooth interactions and intuitive UX.	Good UI with responsive design, reasonable accessibility, good UX.	The UI is functional, partially responsive, and has some accessibility issues.	UI is basic, not responsive, poor user experience.	No functional UI.
+Routing & Navigation	React Router implemented with 5+ routes, protected routes, proper navigation, good URL structure.	Routing works with required routes, basic protected routes.	Routing functional but limited routes or navigation issues.	Routing has problems, limited functionality.	No routing implemented.
+
+Category 4: Security & Testing (15 points)
+Criteria	Excellent (5)	Proficient (4)	Satisfactory (3)	Needs Work (2)	Incomplete (0-1)
+Authentication & Authorization	JWT auth fully implemented, role-based access control works, passwords hashed, tokens properly managed.	Authentication works, basic authorization, passwords secured.	Authentication mostly works, authorization incomplete.	Authentication has issues, security vulnerabilities present.	No authentication implemented.
+Unit Testing	Comprehensive test suite with 80%+ coverage, tests for success and failure cases, mocking used appropriately.	Test suite with 70%+ coverage, covers main scenarios, proper mocking.	Some tests exist, 50-70% coverage, limited scenarios covered.	Minimal tests, <50% coverage.	No tests implemented.
+Integration Testing & Quality	Postman collection complete, API tests comprehensive, SonarQube shows no critical issues, quality gate passed.	Postman collection covers main endpoints, SonarQube runs with minor issues addressed.	Basic Postman tests, SonarQube shows some issues not addressed.	Limited testing, significant quality issues.	No integration testing.
+
+Category 5: AWS Deployment & DevOps (15 points)
+Criteria	Excellent (5)	Proficient (4)	Satisfactory (3)	Needs Work (2)	Incomplete (0-1)
+Infrastructure	Complete configs for all resources, state managed properly.	Provisions all required resources, basic organization.	Provisions most resources	Incomplete, significant additional setup needed.	No implementation.
+CI/CD Pipeline	Jenkins pipeline fully automated with all stages, quality gates enforced, deployment automated.	Jenkins pipeline works with main stages, and the deployments are functional.	Pipeline exists but missing stages or manual intervention needed.	Pipeline incomplete or broken.	No CI/CD implemented.
+AWS Deployment & Monitoring	Application fully deployed, HTTPS configured, CloudWatch monitoring comprehensive, budget alerts set.	Application deployed and accessible, basic monitoring in place.	Application deployed with issues, minimal monitoring.	Deployment partially working, no monitoring.	Application not deployed.
+
+Category 6: Documentation & Presentation (10 points)
+Criteria	Excellent (5)	Proficient (4)	Satisfactory (3)	Needs Work (2)	Incomplete (0-1)
+Technical Documentation	Comprehensive README, API docs auto-generated, deployment guide detailed, architecture decisions documented.	Good README, API documented, basic deployment guide.	Documentation exists but is incomplete or unclear in places.	Minimal documentation, missing key information.	No documentation.
+Presentation & Communication	The presentation is professional, clearly explains the problem/solution, the demo runs smoothly, and handles questions confidently.	Good presentation, clear explanations, demo works, answers questions.	Presentation covers basics, demo has minor issues, answers some questions.	Presentation unclear, demo fails, struggles with questions.	No presentation delivered.
+
+Bonus Points (Up to 5 points)
+Bonus Criteria	Points
+Implemented additional AWS service(s) beyond requirements (e.g., ElastiCache, Lambda, SQS)	+1-2
+Exceptional UI/UX design with animations, advanced accessibility features	+1
+Implemented comprehensive logging and observability beyond requirements	+1
+Used AI tools effectively with documented prompts and iterations	+1
+
+________________________________________
+Submission Guidelines
+Final Submission Requirements
+
+GitHub Repository
+●	Repository URL submitted to Canvas
+●	All code committed to main branch
+●	Clear commit history with meaningful messages
+●	Branch protection rules enabled
+
+Deployed Application
+●	Working URL for frontend (S3)
+●	Working URL for backend API (EC2)
+●	Test credentials provided for demo
+
+Documentation Package
+●	All documents uploaded to Canvas
+●	PDF export of presentation slides
+●	Postman collection exported as JSON
+
+Jira Board
+●	Jira project link shared with instructor
+●	All stories updated to final status
+●	Sprint completed and closed
+Submission Deadline
+All deliverables must be submitted by the end of class on the final day.
+Academic Integrity
+This is an individual project. While you may discuss concepts with peers and use AI tools for assistance, all code and documentation must be your own work. Any code copied from external sources must be properly attributed. Plagiarism or unauthorized collaboration will result in a failing grade.
+

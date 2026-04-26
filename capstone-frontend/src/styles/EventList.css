@@ -64,6 +64,7 @@
   color: #1f2937;
   margin: 0;
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .event-date {
@@ -73,6 +74,32 @@
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   white-space: nowrap;
+}
+
+/* Desktop-specific fixes for event names */
+@media (min-width: 1024px) {
+  .event-name {
+    /* Prevent mid-word breaks on desktop */
+    overflow-wrap: normal;
+    word-break: normal;
+    
+    /* Ensure single-line display with ellipsis */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+    /* Slightly smaller font for better balance in constrained space */
+    font-size: 1rem;
+    
+    /* Allow event name to take available space before date badge */
+    flex: 1;
+    min-width: 0; /* Required for text-overflow to work in flex container */
+  }
+  
+  .event-date {
+    /* Prevent date badge from shrinking */
+    flex-shrink: 0;
+  }
 }
 
 .event-details {

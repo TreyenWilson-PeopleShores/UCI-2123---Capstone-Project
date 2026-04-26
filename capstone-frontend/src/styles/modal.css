@@ -61,6 +61,7 @@
   font-weight: 700;
   color: #1f2937;
   word-break: break-word;
+  overflow-wrap: anywhere;
   flex: 1;
 }
 
@@ -149,6 +150,7 @@
 /* Modal Footer */
 .modal-footer {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   padding: 16px 24px 24px;
   border-top: 1px solid #e5e9f0;

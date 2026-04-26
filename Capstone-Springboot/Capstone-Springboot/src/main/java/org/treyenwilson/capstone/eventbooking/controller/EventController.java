@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.treyenwilson.capstone.eventbooking.dto.EventRequest;
 import org.treyenwilson.capstone.eventbooking.dto.EventResponse;
@@ -14,12 +15,20 @@ import org.treyenwilson.capstone.eventbooking.entity.Event;
 import org.treyenwilson.capstone.eventbooking.repository.EventRepository;
 import org.treyenwilson.capstone.eventbooking.service.EventService;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/events")
 public class EventController {
     private final EventService eventService;
+
+    /** Whitelist of field names accepted for ORDER BY to prevent ORDER BY injection. */
+    private static final Set<String> ALLOWED_SORT_FIELDS =
+            Set.of("id", "event_name", "date", "status", "total_spots", "venue_id");
+
+    /** Whitelist of valid event status values. */
+    private static final Set<String> ALLOWED_STATUSES =
+            Set.of("scheduled", "cancelled", "completed");
 
     public EventController(EventService eventService, EventRepository eventRepository) {
         this.eventService = eventService;
@@ -37,12 +46,18 @@ public class EventController {
     }
 
     @PutMapping("id/{id}/{status}")
+    @PreAuthorize("hasRole('ADMIN')")
     // .../id/{id}/{status: cancelled, completed, or scheduled}
-    public ResponseEntity<EventResponse> changeStatus(
+    public ResponseEntity<?> changeStatus(
             @PathVariable Long id,
-            @PathVariable String status)
-        {EventResponse response = eventService.changeStatus(id, status);
-        return ResponseEntity.ok(response);}
+            @PathVariable String status) {
+        if (!ALLOWED_STATUSES.contains(status.toLowerCase())) {
+            return ResponseEntity.badRequest()
+                    .body("Invalid status. Allowed values: scheduled, cancelled, completed");
+        }
+        EventResponse response = eventService.changeStatus(id, status.toLowerCase());
+        return ResponseEntity.ok(response);
+    }
 
     @GetMapping("id/{id}") // .../api/events/1
     public ResponseEntity<EventResponse> getByEventId(@PathVariable Long id){
@@ -64,26 +79,10 @@ public class EventController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "true") boolean ascending
     ){
-        try {
-            // Map common property names to actual entity field names
-            String mappedSortBy = sortBy;
-            if ("eventName".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "event_name";
-            } else if ("totalSpots".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "total_spots";
-            } else if ("venueId".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "venue_id";
-            }
-            
-            Sort sort = ascending ? Sort.by(mappedSortBy).ascending() : Sort.by(mappedSortBy).descending();
-            Pageable pageable = PageRequest.of(page, size, sort);
-            return eventService.filterByDate(start, end, pageable);
-        } catch (Exception e) {
-            // Fallback to default sorting if there's an issue with the provided sortBy parameter
-            Sort sort = Sort.by("id").ascending();
-            Pageable pageable = PageRequest.of(page, size, sort);
-            return eventService.filterByDate(start, end, pageable);
-        }
+        String resolvedSort = resolveSortField(sortBy);
+        Sort sort = ascending ? Sort.by(resolvedSort).ascending() : Sort.by(resolvedSort).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return eventService.filterByDate(start, end, pageable);
     }
 
     // Adds Support for pagination below
@@ -96,26 +95,10 @@ public class EventController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "true") boolean ascending) {
 
-        try {
-            // Map common property names to actual entity field names
-            String mappedSortBy = sortBy;
-            if ("eventName".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "event_name";
-            } else if ("totalSpots".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "total_spots";
-            } else if ("venueId".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "venue_id";
-            }
-            
-            Sort sort = ascending ? Sort.by(mappedSortBy).ascending() : Sort.by(mappedSortBy).descending();
-            Pageable pageable = PageRequest.of(page, size, sort);
-            return eventService.findAll(pageable);
-        } catch (Exception e) {
-            // Fallback to default sorting if there's an issue with the provided sortBy parameter
-            Sort sort = Sort.by("id").ascending();
-            Pageable pageable = PageRequest.of(page, size, sort);
-            return eventService.findAll(pageable);
-        }
+        String resolvedSort = resolveSortField(sortBy);
+        Sort sort = ascending ? Sort.by(resolvedSort).ascending() : Sort.by(resolvedSort).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return eventService.findAll(pageable);
     }
 
     @GetMapping("status/{status}") // .../api/events/1
@@ -127,26 +110,24 @@ public class EventController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "true") boolean ascending) {
 
-        try {
-            // Map common property names to actual entity field names
-            String mappedSortBy = sortBy;
-            if ("eventName".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "event_name";
-            } else if ("totalSpots".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "total_spots";
-            } else if ("venueId".equalsIgnoreCase(sortBy)) {
-                mappedSortBy = "venue_id";
-            }
-            
-            Sort sort = ascending ? Sort.by(mappedSortBy).ascending() : Sort.by(mappedSortBy).descending();
-            Pageable pageable = PageRequest.of(page, size, sort);
-            return eventService.findByStatus(pageable, status);
-        } catch (Exception e) {
-            // Fallback to default sorting if there's an issue with the provided sortBy parameter
-            Sort sort = Sort.by("id").ascending();
-            Pageable pageable = PageRequest.of(page, size, sort);
-            return eventService.findByStatus(pageable, status);
-        }
+        String resolvedSort = resolveSortField(sortBy);
+        Sort sort = ascending ? Sort.by(resolvedSort).ascending() : Sort.by(resolvedSort).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return eventService.findByStatus(pageable, status);
+    }
+
+    /**
+     * Resolves a user-supplied sort field name to a whitelisted entity field name.
+     * Falls back to "id" if the supplied value is not in the allowed set,
+     * preventing ORDER BY injection via unvalidated sort parameters.
+     */
+    private String resolveSortField(String sortBy) {
+        // Normalize camelCase aliases to actual column names
+        String mapped = sortBy;
+        if ("eventName".equalsIgnoreCase(sortBy))  mapped = "event_name";
+        else if ("totalSpots".equalsIgnoreCase(sortBy)) mapped = "total_spots";
+        else if ("venueId".equalsIgnoreCase(sortBy))    mapped = "venue_id";
+        return ALLOWED_SORT_FIELDS.contains(mapped) ? mapped : "id";
     }
 
 }

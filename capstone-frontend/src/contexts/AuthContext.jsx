@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { login as loginWithApi } from '../services/authService';
 
 const AuthContext = createContext();
 
@@ -9,46 +10,40 @@ export function AuthProvider({ children }) {
   // Load user from localStorage on mount
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
+    const token = localStorage.getItem('accessToken');
+    
+    // If we have user but no token, clear user (need to re-login with JWT)
+    if (savedUser && !token) {
+      console.warn('User found but no JWT token. Clearing user data.');
+      localStorage.removeItem('currentUser');
+      setCurrentUser(null);
+    } else if (savedUser && token) {
       try {
         setCurrentUser(JSON.parse(savedUser));
       } catch (e) {
         console.error('Failed to parse saved user:', e);
         localStorage.removeItem('currentUser');
+        localStorage.removeItem('accessToken');
       }
     }
     setLoading(false);
   }, []);
 
-  // Login: fetch user from API and store
-  const login = async (username) => {
+  // Login: authenticate with backend
+  const login = async (username, password) => {
     try {
-      const response = await fetch(
-        `/api/users?page=0&size=100&sortBy=username&ascending=true`,
-        {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch users');
-      }
-
-      const data = await response.json();
-      const users = data.content || data;
-      const user = users.find(u => u.username === username);
-
+      const authData = await loginWithApi(username, password);
+      
+      // Extract user info from response
+      // The JWT endpoint returns { accessToken, tokenType, user: { id, username, role } }
+      const user = authData.user;
       if (!user) {
-        throw new Error('User not found');
+        throw new Error('Invalid response from server: user data missing');
       }
-
-      // Store user with role (default: USER, check if ADMIN field exists)
+      
       const userWithRole = {
         username: user.username,
-        role: user.role || 'USER', // Assume 'role' field exists; default to USER
+        role: user.role || 'USER',
         id: user.id,
       };
 
@@ -61,10 +56,11 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Logout: clear user
+  // Logout: clear user and token
   const logout = () => {
     setCurrentUser(null);
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('accessToken');
   };
 
   const isAdmin = currentUser?.role === 'ADMIN';

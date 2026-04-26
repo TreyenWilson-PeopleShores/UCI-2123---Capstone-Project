@@ -5,12 +5,15 @@ import jakarta.validation.constraints.*;
 public class UserRequest {
 
     @NotBlank(message = "Username is required")
+    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
     private String username;
 
     @NotBlank(message = "Password is required")
+    @Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
     private String password;
 
     @NotBlank(message = "Role is required")
+    @Size(max = 20, message = "Role must not exceed 20 characters")
     private String role;
 
     //getters and setters below

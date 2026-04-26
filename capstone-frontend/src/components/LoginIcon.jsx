@@ -44,26 +44,34 @@ const LoginIcon = () => {
 
   return (
     <div className="login-icon-container" ref={dropdownRef}>
-      <div 
-        className="login-icon" 
+      <button
+        type="button"
+        className="login-icon"
         onClick={handleProfileClick}
-        role="button"
-        tabIndex={0}
+        aria-haspopup="menu"
         aria-label={currentUser ? `Profile: ${currentUser.username}` : 'Login'}
         aria-expanded={isDropdownOpen}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            handleProfileClick();
-          }
-        }}
       >
         {displayLetter}
-      </div>
+      </button>
 
       {isDropdownOpen && (
         <div className="profile-dropdown" role="menu">
           {currentUser ? (
             <>
+              {/* Show Admin Manager link only for admin users */}
+              {isAdmin && (
+                <button
+                  className="dropdown-item admin-manager-btn"
+                  onClick={() => {
+                    setIsDropdownOpen(false);
+                    navigate('/admin-manager');
+                  }}
+                  role="menuitem"
+                >
+                  Admin Manager
+                </button>
+              )}
               {/* Show My Tickets link only for non-admin users */}
               {!isAdmin && (
                 <button 

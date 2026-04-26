@@ -2,6 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import EventModal from '../components/EventModal';
+import ArrowButton from '../components/ArrowButton';
+import LoadingSpinner from '../components/LoadingSpinner';
+import EventCardSkeleton from '../components/EventCardSkeleton';
+import { getUserTicketSales, getTicketById } from '../services/ticketsService';
+import { getEventById } from '../services/eventsService';
+import { getVenueById } from '../services/venuesService';
 import '../styles/MyTickets.css';
 
 function MyTickets() {
@@ -46,29 +52,21 @@ function MyTickets() {
     try {
       setLoading(true);
       setError(null);
-      
-      const response = await fetch(
-        `/api/tickets-sold/user/${currentUser.id}?page=${page}&size=${pageSize}&sortBy=dateSold&ascending=false`,
-        {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch user tickets: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
+
+      const data = await getUserTicketSales(currentUser.id, {
+        page,
+        size: pageSize,
+        sortBy: 'dateSold',
+        ascending: false,
+      });
+
       const purchases = data.content || data;
       setTicketPurchases(purchases);
       setTotalPages(data.totalPages ?? 0);
-      
+
       console.log(`Fetched ${purchases.length} ticket purchases for user ${currentUser.id}`);
       await processTicketPurchases(purchases);
-      
+
     } catch (err) {
       setError(err.message || 'Failed to load your tickets');
       console.error('Error fetching user tickets:', err);
@@ -96,19 +94,7 @@ function MyTickets() {
       const ticketCache = {};
       const ticketFetches = Object.keys(ticketCounts).map(async (ticketId) => {
         try {
-          const ticketResponse = await fetch(`/api/tickets/id/${ticketId}`, {
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            },
-          });
-
-          if (!ticketResponse.ok) {
-            console.error(`Failed to fetch ticket ${ticketId}: ${ticketResponse.statusText}`);
-            return;
-          }
-
-          const ticket = await ticketResponse.json();
+          const ticket = await getTicketById(ticketId);
           ticketCache[ticketId] = ticket;
         } catch (err) {
           console.error(`Error fetching ticket ${ticketId}:`, err);
@@ -129,19 +115,7 @@ function MyTickets() {
 
       const eventFetches = eventIds.map(async (eventId) => {
         try {
-          const eventResponse = await fetch(`/api/events/id/${eventId}`, {
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            },
-          });
-
-          if (!eventResponse.ok) {
-            console.error(`Failed to fetch event ${eventId}: ${eventResponse.statusText}`);
-            return;
-          }
-
-          const event = await eventResponse.json();
+          const event = await getEventById(eventId);
           eventCache[eventId] = event;
           console.log(`Event ${eventId} fetched:`, {
             id: event.id,
@@ -151,21 +125,12 @@ function MyTickets() {
             venue_id: event.venue_id,
           });
 
-          // If event has venue_id but no venue object, fetch venue details
           const venueId = event.venue_id || event.venueId;
           if (venueId && !event.venue) {
             try {
-              const venueResponse = await fetch(`/api/venues/id/${venueId}`, {
-                headers: {
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/json',
-                },
-              });
-              if (venueResponse.ok) {
-                const venue = await venueResponse.json();
-                venueCache[venueId] = venue;
-                console.log(`Venue ${venueId} fetched:`, venue);
-              }
+              const venue = await getVenueById(venueId);
+              venueCache[venueId] = venue;
+              console.log(`Venue ${venueId} fetched:`, venue);
             } catch (err) {
               console.error(`Error fetching venue ${venueId}:`, err);
             }
@@ -351,7 +316,11 @@ function MyTickets() {
           <Link to="/" className="back-to-events-btn">Back to Events</Link>
         </div>
         <div className="loading-container">
-          <p>Loading your tickets...</p>
+          <LoadingSpinner size="medium" />
+          <p style={{ marginTop: '16px' }}>Loading your tickets...</p>
+        </div>
+        <div className="tickets-list">
+          <EventCardSkeleton count={3} />
         </div>
       </div>
     );
@@ -410,25 +379,21 @@ function MyTickets() {
       </div>
       
       <div className="pagination-controls">
-        <button
-          type="button"
-          className="pagination-button"
+        <ArrowButton
+          direction="left"
           onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
           disabled={page <= 0}
-        >
-          Previous
-        </button>
+          label="Go to previous page"
+        />
         <span className="pagination-info">
           Page {page + 1} of {totalPages || 1}
         </span>
-        <button
-          type="button"
-          className="pagination-button"
+        <ArrowButton
+          direction="right"
           onClick={() => setPage((prev) => Math.min(prev + 1, Math.max(totalPages - 1, 0)))}
           disabled={totalPages <= 1 || page >= totalPages - 1}
-        >
-          Next
-        </button>
+          label="Go to next page"
+        />
       </div>
 
       <div className="tickets-list">

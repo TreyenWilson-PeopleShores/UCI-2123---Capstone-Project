@@ -4,12 +4,15 @@ import jakarta.validation.constraints.*;
 
 public class VenueRequest {
     @NotBlank(message = "You must provide a name for the venue")
+    @jakarta.validation.constraints.Size(max = 200, message = "Venue name must not exceed 200 characters")
     private String venue_name;
 
     @NotBlank(message = "You must provide a location")
+    @jakarta.validation.constraints.Size(max = 200, message = "Location must not exceed 200 characters")
     private String location;
 
     @NotNull(message = "Total spots must be more then 0")
+    @jakarta.validation.constraints.Positive(message = "Total capacity must be a positive number")
     private Long total_capacity;
 
     public VenueRequest() {}

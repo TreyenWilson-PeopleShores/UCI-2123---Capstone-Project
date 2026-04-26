@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import StatusBadge from './StatusBadge';
+import LoadingSpinner from './LoadingSpinner';
+import { getAllEventsByDateRange } from '../services/eventsService';
 import '../styles/EventList.css';
 
 /**
@@ -37,49 +40,19 @@ const UpcomingEvents = ({ maxEvents = 5, onEventClick, events: providedEvents })
       try {
         setLoading(true);
         setError(null);
-        
-        // Since the existing API uses pagination, we need to fetch all pages
-        let allEvents = [];
-        let page = 0;
-        let hasMorePages = true;
-        
-        // Get date range for the next 6 months to ensure we get enough events
+
         const today = new Date();
         const sixMonthsFromNow = new Date();
         sixMonthsFromNow.setMonth(today.getMonth() + 6);
-        
+
         const formatDate = (date) => {
           return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         };
-        
+
         const startDate = formatDate(today);
         const endDate = formatDate(sixMonthsFromNow);
-        
-        while (hasMorePages) {
-          const url = `/api/events/date?start=${startDate}&end=${endDate}&page=${page}`;
-          
-          const response = await fetch(url, {
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            },
-          });
-          
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          
-          const responseData = await response.json();
-          
-          if (responseData.content && Array.isArray(responseData.content)) {
-            allEvents = [...allEvents, ...responseData.content];
-          }
-          
-          // Check if there are more pages
-          hasMorePages = !responseData.last && page < responseData.totalPages - 1;
-          page++;
-        }
-        
+        const { events: allEvents } = await getAllEventsByDateRange(startDate, endDate);
+
         setInternalEvents(allEvents);
       } catch (err) {
         setError(err.message || 'Failed to fetch events');
@@ -187,7 +160,8 @@ const UpcomingEvents = ({ maxEvents = 5, onEventClick, events: providedEvents })
       <div className="event-list-container">
         <h2 className="event-list-title">Upcoming Events</h2>
         <div className="event-loading">
-          <p>Loading upcoming events...</p>
+          <LoadingSpinner size="small" />
+          <p style={{ marginTop: '8px' }}>Loading upcoming events...</p>
         </div>
       </div>
     );
@@ -220,21 +194,15 @@ const UpcomingEvents = ({ maxEvents = 5, onEventClick, events: providedEvents })
       <h2 className="event-list-title">Upcoming Events</h2>
       <div className="event-list">
         {filteredEvents.map(event => (
-          <div 
-            key={event.id} 
+          <button
+            key={event.id}
+            type="button"
             className="event-item"
             onClick={() => onEventClick && onEventClick(event)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onEventClick && onEventClick(event);
-              }
-            }}
+            aria-label={(event.title || event.name || event.event_name || 'Upcoming event') + ' on ' + formatEventDate(event.date) + (event.venue ? ' at ' + getVenueName(event.venue) : '')}
           >
             <div className="event-item-header">
-              <h3 className="event-name">{event.name}</h3>
+              <h3 className="event-name">{event.title || event.name || event.event_name}</h3>
               <span className="event-date">{formatEventDate(event.date)}</span>
             </div>
             <div className="event-details">
@@ -245,11 +213,21 @@ const UpcomingEvents = ({ maxEvents = 5, onEventClick, events: providedEvents })
               )}
               <StatusBadge status={event.status} size="sm" />
             </div>
-          </div>
+          </button>
         ))}
       </div>
     </div>
   );
+};
+
+UpcomingEvents.propTypes = {
+  maxEvents: PropTypes.number,
+  onEventClick: PropTypes.func,
+  events: PropTypes.array
+};
+
+UpcomingEvents.defaultProps = {
+  maxEvents: 5
 };
 
 export default UpcomingEvents;

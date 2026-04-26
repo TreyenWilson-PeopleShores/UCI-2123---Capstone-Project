@@ -1,0 +1,260 @@
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Cal from '../components/Cal';
+import EventModal from '../components/EventModal';
+import LoadingSpinner from '../components/LoadingSpinner';
+import CalendarSkeleton from '../components/CalendarSkeleton';
+import { useAuth } from '../contexts/AuthContext';
+import { getAllEventsByDateRange } from '../services/eventsService';
+import { getTicketsByEventId } from '../services/ticketsService';
+import '../styles/AdminManager.css';
+
+function AdminManager() {
+  const { currentUser, isAdmin, loading } = useAuth();
+  const navigate = useNavigate();
+  const [events, setEvents] = useState([]);
+  const [ticketSummaries, setTicketSummaries] = useState({});
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!loading && (!currentUser || !isAdmin)) {
+      navigate('/', { replace: true });
+    }
+  }, [currentUser, isAdmin, loading, navigate]);
+
+  const getMonthRange = useCallback((date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+
+    const formatDate = (d) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+    return {
+      start: formatDate(firstDay),
+      end: formatDate(lastDay),
+    };
+  }, []);
+
+  const fetchEventsForMonth = useCallback(async (date) => {
+    setLoadingEvents(true);
+    setError(null);
+
+    try {
+      const { start, end } = getMonthRange(date);
+      const { events: allEvents } = await getAllEventsByDateRange(start, end);
+      setEvents(allEvents);
+    } catch (err) {
+      setError(err.message || 'Unable to load events');
+      console.error('AdminManager fetch error:', err);
+    } finally {
+      setLoadingEvents(false);
+    }
+  }, [getMonthRange]);
+
+  const fetchTicketSummaries = useCallback(async (eventList) => {
+    const summaryMap = {};
+
+    await Promise.all(eventList.map(async (event) => {
+      try {
+        const ticketData = await getTicketsByEventId(event.id, { page: 0, size: 10 });
+        const ticketRows = Array.isArray(ticketData) ? ticketData : ticketData.content || [];
+
+        if (ticketRows.length === 0) {
+          return;
+        }
+
+        const totalSold = ticketRows.reduce((sum, row) => sum + (Number(row.sold) || 0), 0);
+        const totalQuantity = ticketRows.reduce((sum, row) => sum + (Number(row.total_quantity) || 0), 0);
+
+        summaryMap[event.id] = {
+          sold: totalSold,
+          total_quantity: totalQuantity,
+          event: ticketRows[0].event || event,
+        };
+      } catch (err) {
+        console.error(`Ticket summary fetch failed for event ${event.id}:`, err);
+      }
+    }));
+
+    setTicketSummaries(summaryMap);
+  }, []);
+
+  useEffect(() => {
+    if (isAdmin && events.length > 0) {
+      fetchTicketSummaries(events);
+    } else if (events.length === 0) {
+      setTicketSummaries({});
+    }
+  }, [events, fetchTicketSummaries, isAdmin]);
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetchEventsForMonth(currentMonth);
+    }
+  }, [currentMonth, fetchEventsForMonth, isAdmin]);
+
+  const handleMonthChange = useCallback((newDate) => {
+    setCurrentMonth(newDate);
+  }, []);
+
+  const handleEventClick = useCallback((event) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false);
+    setSelectedEvent(null);
+  }, []);
+
+  const handleStatusChange = useCallback((eventId, newStatus) => {
+    setEvents((prev) => prev.map((event) =>
+      event.id === eventId ? { ...event, status: newStatus } : event
+    ));
+  }, []);
+
+  const handleTicketPurchased = useCallback((eventId) => {
+    fetchEventsForMonth(currentMonth);
+  }, [currentMonth, fetchEventsForMonth]);
+
+  const soldOutEvents = useMemo(() => {
+    return events.filter((event) => {
+      const summary = ticketSummaries[event.id];
+      return event.status === 'SCHEDULED' && 
+             summary && 
+             summary.total_quantity > 0 && 
+             summary.sold >= summary.total_quantity;
+    });
+  }, [events, ticketSummaries]);
+
+  const formatEventDate = (dateValue) => {
+    if (!dateValue) return 'Unknown date';
+    try {
+      // Parse date string manually to avoid timezone issues
+      // Expected format: YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss
+      const dateStr = String(dateValue);
+      const dateMatch = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      
+      if (!dateMatch) {
+        // Fallback to Date object if format doesn't match
+        const date = new Date(dateValue);
+        if (Number.isNaN(date.getTime())) return 'Unknown date';
+        
+        return date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        });
+      }
+      
+      // Extract year, month, day from the string
+      const year = parseInt(dateMatch[1], 10);
+      const month = parseInt(dateMatch[2], 10) - 1; // Convert to 0-indexed
+      const day = parseInt(dateMatch[3], 10);
+      
+      // Create date object with local timezone (midnight)
+      const date = new Date(year, month, day);
+      
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    } catch {
+      return 'Unknown date';
+    }
+  };
+
+  const getVenueLabel = (event) => {
+    return event?.venue?.venue_name || event?.venue?.name || event?.venue_name || event?.location || 'Venue unknown';
+  };
+
+  return (
+    <div className="admin-manager-page">
+      <button
+        className="back-to-events-btn"
+        onClick={() => navigate('/')}
+        type="button"
+        aria-label="Back to events"
+      >
+        ← Back to Events
+      </button>
+
+      <header className="admin-manager-header">
+        <div>
+          <h1>Admin Manager</h1>
+          <p>Monitor event scheduling, status, and capacity from a single oversight view.</p>
+        </div>
+      </header>
+
+      <div className="admin-manager-content">
+        <section className="admin-manager-calendar-panel">
+          {loadingEvents ? (
+            <CalendarSkeleton />
+          ) : (
+            <Cal
+              events={events}
+              loading={loadingEvents}
+              currentMonth={currentMonth}
+              onMonthChange={handleMonthChange}
+              onStatusChange={handleStatusChange}
+              onTicketPurchased={handleTicketPurchased}
+              onEventClick={handleEventClick}
+            />
+          )}
+        </section>
+
+        <aside className="sold-out-panel">
+          <div className="sold-out-card">
+            <div className="sold-out-card-header">
+              <h2>Sold Out Events</h2>
+              <p className="sold-out-subtitle">Events with full capacity in the selected month.</p>
+            </div>
+
+            {loadingEvents ? (
+              <div className="admin-info-text">
+                <LoadingSpinner size="small" />
+                <span style={{ marginLeft: '8px' }}>Loading sold out events...</span>
+              </div>
+            ) : error ? (
+              <p className="admin-error-text">{error}</p>
+            ) : soldOutEvents.length === 0 ? (
+              <p className="admin-info-text">No sold out events in this month.</p>
+            ) : (
+              <ul className="sold-out-list">
+                {soldOutEvents.map((event) => (
+                  <li key={event.id}>
+                    <button
+                      type="button"
+                      className="sold-out-item"
+                      onClick={() => handleEventClick(event)}
+                    >
+                      <span className="sold-out-title">{event.event_name || event.title || event.name || 'Unnamed event'}</span>
+                      <span className="sold-out-meta">{formatEventDate(event.date)} · {getVenueLabel(event)}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </aside>
+      </div>
+
+      <EventModal
+        event={selectedEvent}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onStatusChange={handleStatusChange}
+        onTicketPurchased={handleTicketPurchased}
+      />
+    </div>
+  );
+}
+
+export default AdminManager;

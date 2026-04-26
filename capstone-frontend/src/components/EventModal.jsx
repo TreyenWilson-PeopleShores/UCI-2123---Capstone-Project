@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useAuth } from '../contexts/AuthContext';
 import StatusBadge from './StatusBadge';
+import LoadingSpinner from './LoadingSpinner';
+import { getVenueById } from '../services/venuesService';
+import { getTicketsByEventId, createTicketSale, updateTicketSoldCount, incrementTicketSoldCount } from '../services/ticketsService';
+import { updateEventStatus } from '../services/eventsService';
 
 function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased, ticketsOwned }) {
   const { currentUser, isAdmin } = useAuth();
@@ -41,20 +46,9 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased,
       const venueId = event.venue_id || event.venueId;
       if (venueId) {
         try {
-          const response = await fetch(`/api/venues/id/${venueId}`, {
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            },
-          });
-          if (response.ok) {
-            const venue = await response.json();
-            setVenueData(venue);
-            console.log('EventModal fetched venue:', venue);
-          } else {
-            console.error(`Failed to fetch venue ${venueId}: ${response.statusText}`);
-            setVenueData(null);
-          }
+          const venue = await getVenueById(venueId);
+          setVenueData(venue);
+          console.log('EventModal fetched venue:', venue);
         } catch (err) {
           console.error(`Error fetching venue ${venueId}:`, err);
           setVenueData(null);
@@ -79,25 +73,14 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased,
       setTicketError('');
       
       try {
-        // Fetch ticket for the event
-        const response = await fetch(
-          `/api/tickets/event/${event.id}?page=0&size=1&sortBy=id&ascending=true`,
-          {
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch ticket: ${response.statusText}`);
-        }
-        
-        const ticketData = await response.json();
-        // Handle both response formats: content array or direct array
+        const ticketData = await getTicketsByEventId(event.id, {
+          page: 0,
+          size: 1,
+          sortBy: 'id',
+          ascending: true,
+        });
         const tickets = Array.isArray(ticketData) ? ticketData : (ticketData.content || []);
-        
+
         if (tickets.length === 0) {
           setTicketPrice(null);
           setTicketError('No ticket information available');
@@ -223,22 +206,8 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased,
 
     setIsUpdating(true);
     try {
-      const response = await fetch(
-        `/api/events/id/${event.id}/${newStatus}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      await updateEventStatus(event.id, newStatus);
 
-      if (!response.ok) {
-        throw new Error(`Failed to update status: ${response.statusText}`);
-      }
-
-      // Callback to parent to update events
       if (onStatusChange) {
         onStatusChange(event.id, newStatus);
       }
@@ -246,7 +215,6 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased,
       console.log(`Event ${event.id} status updated to ${newStatus}`);
     } catch (error) {
       console.error('Status update failed:', error);
-      // Revert to previous status on error
       setSelectedStatus(event.status);
     } finally {
       setIsUpdating(false);
@@ -275,22 +243,13 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased,
     try {
       // Step 1: Fetch ticket for the event
       console.log(`Fetching ticket for event ID: ${event.id}`);
-      const ticketResponse = await fetch(
-        `/api/tickets/event/${event.id}?page=0&size=1&sortBy=id&ascending=true`,
-        {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const ticketData = await getTicketsByEventId(event.id, {
+        page: 0,
+        size: 1,
+        sortBy: 'id',
+        ascending: true,
+      });
       
-      if (!ticketResponse.ok) {
-        throw new Error(`Failed to fetch ticket: ${ticketResponse.statusText}`);
-      }
-      
-      const ticketData = await ticketResponse.json();
-      // Handle both response formats: content array or direct array
       const tickets = Array.isArray(ticketData) ? ticketData : (ticketData.content || []);
       
       if (tickets.length === 0) {
@@ -301,7 +260,7 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased,
       console.log('Ticket fetched:', {
         id: ticket.id,
         sold: ticket.sold,
-        total_quantity: ticket.total_quantity
+        total_quantity: ticket.total_quantity,
       });
       
       // Check if ticket is sold out
@@ -316,45 +275,15 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased,
       const ticketSaleBody = {
         user_id: currentUser.id,
         ticket_id: ticket.id,
-        date_sold: today
+        date_sold: today,
       };
       
       console.log('Creating ticket sale with body:', ticketSaleBody);
-      console.log('POST /api/tickets-sold');
+      await createTicketSale(ticketSaleBody);
       
-      const saleResponse = await fetch('/api/tickets-sold', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(ticketSaleBody)
-      });
-      
-      console.log('Ticket sale response status:', saleResponse.status);
-      
-      if (!saleResponse.ok) {
-        throw new Error(`Failed to create ticket sale: ${saleResponse.statusText}`);
-      }
-      
-      // Step 3: Update ticket sold count
-      const newSoldCount = ticket.sold + 1;
-      console.log(`Updating ticket sold count to: ${newSoldCount}`);
-      console.log(`PUT /api/tickets/id/${ticket.id}/sold/${newSoldCount}`);
-      
-      const updateResponse = await fetch(`/api/tickets/id/${ticket.id}/sold/${newSoldCount}`, {
-        method: 'PUT',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      console.log('Ticket update response status:', updateResponse.status);
-      
-      if (!updateResponse.ok) {
-        throw new Error(`Failed to update ticket sold count: ${updateResponse.statusText}`);
-      }
+      // Step 3: Increment ticket sold count
+      console.log(`Incrementing ticket sold count for ticket ID: ${ticket.id}`);
+      await incrementTicketSoldCount(ticket.id);
       
       // Success!
       setPurchaseMessage('Ticket purchased successfully!');
@@ -417,6 +346,8 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased,
     <dialog 
       className="modal"
       ref={modalRef}
+      aria-modal="true"
+      aria-labelledby="modal-title"
     >
       <div className="modal-content">
         {/* Header with close button */}
@@ -486,7 +417,10 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased,
             </label>
             <div id="ticket-price" className="modal-value">
               {ticketLoading ? (
-                <span className="ticket-price-loading">Loading price...</span>
+                <div className="ticket-price-loading">
+                  <LoadingSpinner size="small" />
+                  <span style={{ marginLeft: '8px' }}>Loading price...</span>
+                </div>
               ) : ticketError ? (
                 <span className="ticket-price-error">{ticketError}</span>
               ) : (
@@ -521,7 +455,12 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased,
                 disabled={isPurchasing}
                 aria-label={`Purchase ticket for ${getEventName()}`}
               >
-                {isPurchasing ? 'Purchasing...' : 'Buy Ticket'}
+                {isPurchasing ? (
+                  <>
+                    <LoadingSpinner size="small" color="light" />
+                    <span style={{ marginLeft: '8px' }}>Purchasing...</span>
+                  </>
+                ) : 'Buy Ticket'}
               </button>
               {purchaseMessage && (
                 <p className="purchase-success" style={{ color: 'green', marginTop: '10px' }}>
@@ -552,5 +491,20 @@ function EventModal({ event, isOpen, onClose, onStatusChange, onTicketPurchased,
     </dialog>
   );
 }
+
+EventModal.propTypes = {
+  event: PropTypes.object,
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onStatusChange: PropTypes.func,
+  onTicketPurchased: PropTypes.func,
+  ticketsOwned: PropTypes.array
+};
+
+EventModal.defaultProps = {
+  onStatusChange: () => {},
+  onTicketPurchased: () => {},
+  ticketsOwned: []
+};
 
 export default EventModal;

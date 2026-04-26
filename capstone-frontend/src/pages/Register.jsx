@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { registerUser } from '../services/usersService';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -29,38 +30,25 @@ const Register = () => {
     }
 
     try {
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username.trim(),
-          password: password.trim(),
-          role: 'USER'
-        }),
+      await registerUser({
+        username: username.trim(),
+        password: password.trim(),
+        role: 'USER',
       });
 
-      if (response.ok) {
-        setSuccessMessage('Registration successful! Redirecting to login...');
-        // Redirect to login after 2 seconds
-        setTimeout(() => {
-          navigate('/login');
-        }, 2000);
-      } else {
-        const errorData = await response.json();
-        // Handle validation errors from backend
-        if (errorData.message) {
-          setError(errorData.message);
-        } else if (response.status === 400) {
-          setError('Username may already exist or validation failed');
-        } else {
-          setError('Registration failed. Please try again.');
-        }
-      }
+      setSuccessMessage('Registration successful! Redirecting to login...');
+      // Redirect to login after 2 seconds
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } catch (err) {
+      const errorMessage = err.message || 'Network error. Please check your connection and try again.';
+      if (errorMessage.includes('400')) {
+        setError('Username may already exist or validation failed');
+      } else {
+        setError(errorMessage);
+      }
       console.error('Registration error:', err);
-      setError('Network error. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }

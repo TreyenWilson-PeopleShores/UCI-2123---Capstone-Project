@@ -225,6 +225,112 @@ DELIMITER ;
 CALL seed_events();
 
 -- =========================================================
+-- ADD APRIL 2026 EVENTS FOR DEMONSTRATION
+-- - Generate ~20 events in April 2026
+-- - Max 3 events per day
+-- - Events before April 26th are COMPLETED or CANCELLED
+-- =========================================================
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS seed_april_2026_events $$
+CREATE PROCEDURE seed_april_2026_events()
+BEGIN
+    DECLARE day_counter INT DEFAULT 1;
+    DECLARE events_today INT;
+    DECLARE venue_idx INT;
+    DECLARE event_date DATE;
+    DECLARE event_status VARCHAR(10);
+    DECLARE venue_capacity BIGINT;
+    DECLARE total_spots_val INT;
+    DECLARE venue_count INT;
+    
+    SELECT COUNT(*) INTO venue_count FROM venues;
+    
+    -- Generate events for each day in April 2026 (1-30)
+    WHILE day_counter <= 30 DO
+        SET event_date = DATE('2026-04-01') + INTERVAL (day_counter - 1) DAY;
+        
+        -- Determine how many events for this day (0-3, average ~0.67 per day to get ~20 total)
+        SET events_today = FLOOR(RAND() * 4); -- 0 to 3 events per day
+        
+        WHILE events_today > 0 DO
+            -- Pick a random venue
+            SET venue_idx = 1 + FLOOR(RAND() * venue_count);
+            
+            -- Check if this venue already has an event on this date
+            IF NOT EXISTS (SELECT 1 FROM events WHERE venue_id = venue_idx AND date = event_date) THEN
+                -- Determine status based on date
+                IF event_date < '2026-04-26' THEN
+                    -- Before presentation day: mostly COMPLETED, some CANCELLED
+                    IF RAND() < 0.15 THEN
+                        SET event_status = 'CANCELLED';
+                    ELSE
+                        SET event_status = 'COMPLETED';
+                    END IF;
+                ELSE
+                    -- On or after presentation day: mostly SCHEDULED, some CANCELLED
+                    IF RAND() < 0.10 THEN
+                        SET event_status = 'CANCELLED';
+                    ELSE
+                        SET event_status = 'SCHEDULED';
+                    END IF;
+                END IF;
+                
+                -- Get venue capacity and calculate spots
+                SELECT total_capacity INTO venue_capacity FROM venues WHERE id = venue_idx;
+                SET total_spots_val = LEAST(GREATEST(FLOOR(venue_capacity * (0.6 + RAND()*0.35)), 200), 100000);
+                
+                -- Insert the event
+                INSERT INTO events (event_name, date, status, total_spots, venue_id)
+                VALUES (
+                    CONCAT(
+                        CASE FLOOR(RAND()*6)
+                            WHEN 0 THEN 'Spring Tech Summit'
+                            WHEN 1 THEN 'April Music Night'
+                            WHEN 2 THEN 'Championship Finals'
+                            WHEN 3 THEN 'Comedy Special'
+                            WHEN 4 THEN 'Startup Launch'
+                            ELSE 'Community Festival'
+                        END,
+                        ' April 2026'
+                    ),
+                    event_date,
+                    event_status,
+                    total_spots_val,
+                    venue_idx
+                );
+                
+                SET events_today = events_today - 1;
+            END IF;
+        END WHILE;
+        
+        SET day_counter = day_counter + 1;
+    END WHILE;
+END $$
+
+DELIMITER ;
+
+CALL seed_april_2026_events();
+
+-- =========================================================
+-- UPDATE EXISTING EVENTS BEFORE APRIL 26TH 2026
+-- - Events before presentation day should be COMPLETED or CANCELLED
+-- =========================================================
+
+UPDATE events 
+SET status = CASE 
+    WHEN RAND() < 0.15 THEN 'CANCELLED'
+    ELSE 'COMPLETED'
+END
+WHERE id IN (
+    SELECT id FROM (
+        SELECT id FROM events 
+        WHERE date < '2026-04-26' AND status = 'SCHEDULED'
+    ) AS temp
+);
+
+-- =========================================================
 -- TICKETS: one ticket row per event (enforces UNIQUE(event_id))
 -- price depends on venue size + slight randomness
 -- sold respects status:
@@ -272,16 +378,30 @@ BEGIN
     DECLARE chosen_ticket INT;
     DECLARE ev_date DATE;
     DECLARE sold_date DATE;
-
+    
+    -- Create temporary table to store eligible tickets for faster random selection
+    DROP TEMPORARY TABLE IF EXISTS eligible_tickets;
+    CREATE TEMPORARY TABLE eligible_tickets (
+        id INT PRIMARY KEY,
+        event_date DATE,
+        sold_count INT,
+        INDEX idx_sold (sold_count)
+    );
+    
+    -- Insert all tickets with sold > 0 into temporary table
+    INSERT INTO eligible_tickets (id, event_date, sold_count)
+    SELECT t.id, e.date, t.sold
+    FROM tickets t
+    JOIN events e ON e.id = t.event_id
+    WHERE t.sold > 0;
+    
     SELECT COUNT(*) INTO max_users FROM users;
 
     WHILE n <= 6000 DO
-        -- choose a ticket that has sold > 0
-        SELECT t.id, e.date
+        -- choose a ticket from eligible tickets using RAND() on smaller set
+        SELECT id, event_date
         INTO chosen_ticket, ev_date
-        FROM tickets t
-        JOIN events e ON e.id = t.event_id
-        WHERE t.sold > 0
+        FROM eligible_tickets
         ORDER BY RAND()
         LIMIT 1;
 
@@ -300,8 +420,34 @@ BEGIN
 
         SET n = n + 1;
     END WHILE;
+    
+    -- Clean up temporary table
+    DROP TEMPORARY TABLE eligible_tickets;
 END $$
 
 DELIMITER ;
 
 CALL seed_ticket_sales();
+
+
+-- =========================================================
+-- SOLD OUT TICKETS IMPLEMENTATION
+-- - ~20% of all SCHEDULED events should be sold out
+-- - ~40% of April 2026 events should be sold out
+-- =========================================================
+
+-- First, make ~20% of all SCHEDULED events sold out
+UPDATE tickets t
+JOIN events e ON e.id = t.event_id
+SET t.sold = t.total_quantity
+WHERE e.status = 'SCHEDULED' AND RAND() < 0.20;
+
+-- Then ensure ~40% of April 2026 events are sold out
+-- This will override some of the above for April events
+UPDATE tickets t
+JOIN events e ON e.id = t.event_id
+SET t.sold = t.total_quantity
+WHERE e.status = 'SCHEDULED' 
+  AND e.date >= '2026-04-01' 
+  AND e.date <= '2026-04-30'
+  AND RAND() < 0.40;

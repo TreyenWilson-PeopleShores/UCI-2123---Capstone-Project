@@ -20,16 +20,22 @@ const Login = () => {
       setLoading(false);
       return;
     }
+    
+    if (!password.trim()) {
+      setError('Please enter a password');
+      setLoading(false);
+      return;
+    }
 
     // Attempt login
-    const success = await login(username);
+    const success = await login(username, password);
     setLoading(false);
 
     if (success) {
       // Redirect to events page on successful login
       navigate('/');
     } else {
-      setError('Login failed. User not found.');
+      setError('Invalid username or password');
     }
   };
 

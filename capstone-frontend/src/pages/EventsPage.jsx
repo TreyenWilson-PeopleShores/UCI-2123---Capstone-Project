@@ -1,15 +1,53 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useReducer } from 'react';
 import Cal from '../components/Cal';
 import UpcomingEvents from '../components/UpcomingEvents';
 import EventModal from '../components/EventModal';
+import LoadingSpinner from '../components/LoadingSpinner';
+import CalendarSkeleton from '../components/CalendarSkeleton';
+import { getAllEventsByDateRange, getEventsByDateRange } from '../services/eventsService';
+
+// Reducer for event loading state
+const eventLoadingReducer = (state, action) => {
+  switch (action.type) {
+    case 'FETCH_START':
+      return {
+        ...state,
+        loading: true,
+        error: null
+      };
+    case 'FETCH_SUCCESS':
+      return {
+        ...state,
+        loading: false,
+        error: null,
+        events: action.payload
+      };
+    case 'FETCH_ERROR':
+      return {
+        ...state,
+        loading: false,
+        error: action.payload
+      };
+    case 'UPDATE_EVENTS':
+      return {
+        ...state,
+        events: action.payload
+      };
+    default:
+      return state;
+  }
+};
+
+// Initial state for event loading
+const initialEventLoadingState = {
+  events: [],
+  loading: true,
+  error: null
+};
 
 function EventsPage() {
-  // State to store the events data for current month
-  const [events, setEvents] = useState([]);
-  // State to track loading status
-  const [loading, setLoading] = useState(true);
-  // State to track any errors
-  const [error, setError] = useState(null);
+  // State for event loading, error, and data using useReducer
+  const [eventState, dispatch] = useReducer(eventLoadingReducer, initialEventLoadingState);
   // State to track current month (for fetching events by month)
   const [currentMonth, setCurrentMonth] = useState(new Date());
   // State for shared modal
@@ -40,54 +78,17 @@ function EventsPage() {
   // Function to fetch all events for a month with pagination
   const fetchEventsForMonth = useCallback(async (date) => {
     try {
-      setLoading(true);
-      setError(null);
-      
+      dispatch({ type: 'FETCH_START' });
+
       const { start, end } = getMonthRange(date);
       console.log(`Fetching events for ${start} to ${end}`);
-      
-      let allEvents = [];
-      let page = 0;
-      let hasMorePages = true;
-      
-      // Fetch all pages for the month
-      while (hasMorePages) {
-        const url = `/api/events/date?start=${start}&end=${end}&page=${page}`;
-        console.log(`Fetching page ${page}: ${url}`);
-        
-        const response = await fetch(url, {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        });
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Error response:', errorText);
-          throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
-        }
-        
-        const responseData = await response.json();
-        console.log(`Page ${page} response:`, responseData);
-        
-        // Add events from this page
-        if (responseData.content && Array.isArray(responseData.content)) {
-          allEvents = [...allEvents, ...responseData.content];
-        }
-        
-        // Check if there are more pages
-        hasMorePages = !responseData.last && page < responseData.totalPages - 1;
-        page++;
-      }
-      
+
+      const { events: allEvents } = await getAllEventsByDateRange(start, end);
       console.log(`Total events for month: ${allEvents.length}`);
-      setEvents(allEvents);
+      dispatch({ type: 'FETCH_SUCCESS', payload: allEvents });
     } catch (err) {
-      setError(err.message || 'Failed to fetch events');
+      dispatch({ type: 'FETCH_ERROR', payload: err.message || 'Failed to fetch events' });
       console.error('Error fetching events:', err);
-    } finally {
-      setLoading(false);
     }
   }, []);
 
@@ -104,14 +105,13 @@ function EventsPage() {
   // Function to handle status change from modal (admin status update)
   const handleStatusChange = useCallback((eventId, newStatus) => {
     // Update the events list with the new status
-    setEvents(prevEvents => 
-      prevEvents.map(event => 
-        event.id === eventId ? { ...event, status: newStatus } : event
-      )
+    const updatedEvents = eventState.events.map(event => 
+      event.id === eventId ? { ...event, status: newStatus } : event
     );
+    dispatch({ type: 'UPDATE_EVENTS', payload: updatedEvents });
     // Optionally, refetch all events to ensure consistency
     // fetchEventsForMonth(currentMonth);
-  }, []);
+  }, [eventState.events]);
 
   // Function to handle ticket purchase from modal
   const handleTicketPurchased = useCallback((eventId) => {
@@ -135,12 +135,12 @@ function EventsPage() {
   // Don't hide the entire page during loading - show loading state inline
 
   // Render error state
-  if (error) {
+  if (eventState.error) {
     return (
       <div className="events-page">
         <h1>Events</h1>
         <div className="error">
-          <p>Error: {error}</p>
+          <p>Error: {eventState.error}</p>
           <p>Check if:</p>
           <ul>
             <li>Backend is running on http://localhost:8080</li>
@@ -150,24 +150,17 @@ function EventsPage() {
         </div>
         <button onClick={() => window.location.reload()}>Retry</button>
         <button onClick={() => {
-          setLoading(true);
-          setError(null);
-          // Re-fetch events for current month
+          dispatch({ type: 'FETCH_START' });
           const { start, end } = getMonthRange(currentMonth);
-          fetch(`/api/events/date?start=${start}&end=${end}&page=0`)
-            .then(res => {
-              console.log('Manual fetch status:', res.status);
-              return res.text();
-            })
-            .then(text => {
-              console.log('Manual fetch response (first 500 chars):', text.substring(0, 500));
-              setError('Response preview: ' + text.substring(0, 200));
-              setLoading(false);
+          getEventsByDateRange(start, end, 0)
+            .then((responseData) => {
+              console.log('Manual fetch response:', responseData);
+              const stringified = JSON.stringify(responseData);
+              dispatch({ type: 'FETCH_ERROR', payload: `Response preview: ${stringified.substring(0, 200)}` });
             })
             .catch(err => {
               console.error('Manual fetch error:', err);
-              setError('Manual fetch error: ' + err.message);
-              setLoading(false);
+              dispatch({ type: 'FETCH_ERROR', payload: 'Manual fetch error: ' + err.message });
             });
         }}>Debug Response</button>
       </div>
@@ -182,33 +175,54 @@ function EventsPage() {
   return (
     <div className="events-page">
       <h1>Events</h1>
-      <p>
-        Showing events for {currentMonthName} {currentYear}: {events.length} event{events.length !== 1 ? 's' : ''}
-        {loading && ' (loading...)'}
-      </p>
+      <div className="events-summary">
+        Showing events for {currentMonthName} {currentYear}: {eventState.events.length} event{eventState.events.length !== 1 ? 's' : ''}
+        {eventState.loading && (
+          <span style={{ marginLeft: '8px' }}>
+            <LoadingSpinner size="small" />
+            <span style={{ marginLeft: '8px' }}>loading...</span>
+          </span>
+        )}
+      </div>
       
       {/* Responsive Layout Container */}
       <div className="events-layout">
         {/* Upcoming Events Section - Sidebar on desktop, top on mobile */}
         <div className="upcoming-events-container">
-          <UpcomingEvents 
-            maxEvents={5} 
-            onEventClick={handleEventClick}
-            events={events}
-          />
+          {eventState.loading ? (
+            <div className="skeleton-card event-card-skeleton" style={{ marginBottom: '20px' }}>
+              <div className="skeleton skeleton-image"></div>
+              <div className="skeleton-content">
+                <div className="skeleton skeleton-title"></div>
+                <div className="skeleton skeleton-text"></div>
+                <div className="skeleton skeleton-text short"></div>
+                <div className="skeleton skeleton-button"></div>
+              </div>
+            </div>
+          ) : (
+            <UpcomingEvents 
+              maxEvents={5} 
+              onEventClick={handleEventClick}
+              events={eventState.events}
+            />
+          )}
         </div>
         
         {/* Calendar Section - Main content area */}
         <div className="calendar-container">
-          <Cal 
-            events={events} 
-            loading={loading} 
-            currentMonth={currentMonth} 
-            onMonthChange={handleMonthChange}
-            onStatusChange={handleStatusChange}
-            onTicketPurchased={handleTicketPurchased}
-            onEventClick={handleEventClick}
-          />
+          {eventState.loading ? (
+            <CalendarSkeleton />
+          ) : (
+            <Cal 
+              events={eventState.events} 
+              loading={eventState.loading} 
+              currentMonth={currentMonth} 
+              onMonthChange={handleMonthChange}
+              onStatusChange={handleStatusChange}
+              onTicketPurchased={handleTicketPurchased}
+              onEventClick={handleEventClick}
+            />
+          )}
         </div>
       </div>
       

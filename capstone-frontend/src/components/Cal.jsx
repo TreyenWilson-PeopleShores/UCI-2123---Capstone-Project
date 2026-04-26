@@ -1,4 +1,7 @@
 import { useMemo } from 'react';
+import PropTypes from 'prop-types';
+import ArrowButton from './ArrowButton';
+import LoadingSpinner from './LoadingSpinner';
 
 function Cal({ events = [], loading = false, currentMonth: currentDate = new Date(), onMonthChange, onStatusChange, onTicketPurchased, onEventClick }) {
   // Event handlers
@@ -164,30 +167,34 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
   return (
     <section className="cal-component" aria-label="Event calendar">
       <h2>Event Calendar</h2>
+      <div className="calendar-divider" aria-hidden="true" />
       
       <div className="calendar-navigation" role="navigation" aria-label="Calendar navigation">
-        <button 
-          className="nav-button"
+        <ArrowButton
+          direction="left"
           onClick={goToPreviousMonth}
-          aria-label={`Go to previous month, ${monthNames[currentMonth === 0 ? 11 : currentMonth - 1]} ${currentMonth === 0 ? currentYear - 1 : currentYear}`}
           disabled={loading}
-        >
-          &larr;
-        </button>
+          label={`Go to previous month, ${monthNames[currentMonth === 0 ? 11 : currentMonth - 1]} ${currentMonth === 0 ? currentYear - 1 : currentYear}`}
+          className="nav-button"
+        />
         
         <h3 className="current-month" id="current-month-heading">
           {monthNames[currentMonth]} {currentYear}
-          {loading && ' (loading...)'}
+          {loading && (
+            <span style={{ marginLeft: '8px' }}>
+              <LoadingSpinner size="small" />
+              <span style={{ marginLeft: '8px' }}>loading...</span>
+            </span>
+          )}
         </h3>
         
-        <button 
-          className="nav-button"
+        <ArrowButton
+          direction="right"
           onClick={goToNextMonth}
-          aria-label={`Go to next month, ${monthNames[currentMonth === 11 ? 0 : currentMonth + 1]} ${currentMonth === 11 ? currentYear + 1 : currentYear}`}
           disabled={loading}
-        >
-          &rarr;
-        </button>
+          label={`Go to next month, ${monthNames[currentMonth === 11 ? 0 : currentMonth + 1]} ${currentMonth === 11 ? currentYear + 1 : currentYear}`}
+          className="nav-button"
+        />
       </div>
       
       <div className="calendar-grid" role="grid" aria-labelledby="current-month-heading" aria-readonly="true">
@@ -272,5 +279,21 @@ function Cal({ events = [], loading = false, currentMonth: currentDate = new Dat
     </section>
   );
 }
+
+Cal.propTypes = {
+  events: PropTypes.array,
+  loading: PropTypes.bool,
+  currentMonth: PropTypes.instanceOf(Date),
+  onMonthChange: PropTypes.func,
+  onStatusChange: PropTypes.func,
+  onTicketPurchased: PropTypes.func,
+  onEventClick: PropTypes.func
+};
+
+Cal.defaultProps = {
+  events: [],
+  loading: false,
+  currentMonth: new Date()
+};
 
 export default Cal;
