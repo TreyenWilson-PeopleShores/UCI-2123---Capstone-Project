@@ -46,8 +46,8 @@ UCI 2123 Capstone Project
 - Pages: EventsPage.jsx, Login.jsx, MyTickets.jsx, AdminManager.jsx
 
 **Backend:** Enforces business rules, validation, pagination, and consistent REST patterns
-- Spring Boot 3.4+ with Spring Security JWT
-- 15+ verified API endpoints with role-based access
+- Spring Boot (as configured in pom.xml) with Spring Security JWT
+- 29 verified API endpoints with role-based access (documented in API-Documentation-V4.md)
 - Comprehensive error handling and input validation
 
 **Database:** Persists events, venues, users, tickets, and ticket sales for reporting
@@ -136,7 +136,7 @@ UCI 2123 Capstone Project
 - CORS configuration for frontend-backend communication
 
 **Testing & Verification:**
-- **64 Unit Tests** covering AuthService, UserService, TicketSoldService
+- **42 Unit Tests** covering AuthService, UserService, TicketSoldService
 - **Mock-based testing** with Mockito and JUnit 5
 - **API Verification:** All endpoints manually tested and documented
 - **Code Coverage:** JaCoCo integration for test coverage reporting

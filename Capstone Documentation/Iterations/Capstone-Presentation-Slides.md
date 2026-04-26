@@ -60,7 +60,7 @@
 
 **Technology Stack:**
 - **Frontend:** React 18+ with Vite, React Router, Axios for API calls
-- **Backend:** Spring Boot 3.4+, Spring Security with JWT, Spring Data JPA
+- **Backend:** Spring Boot (as configured in pom.xml), Spring Security with JWT, Spring Data JPA
 - **Database:** MySQL 8.0+ with 5 normalized tables
 - **Authentication:** JWT tokens with 1-hour expiration
 - **Build Tools:** Maven (backend), npm (frontend)
@@ -131,10 +131,10 @@
 
 ## Slide 8: Testing & Verification
 
-**Unit Testing (64 Test Cases):**
-- **AuthServiceTest:** 24 tests covering authentication, registration, error handling
-- **UserServiceTest:** 20 tests covering user retrieval, pagination, role normalization
-- **TicketSoldServiceTest:** 20 tests covering sales filtering, edge cases, boundary testing
+**Unit Testing (42 Test Cases):**
+- **AuthServiceTest:** 18 tests covering authentication, registration, error handling
+- **UserServiceTest:** 13 tests covering user retrieval, pagination, role normalization
+- **TicketSoldServiceTest:** 11 tests covering sales filtering, edge cases, boundary testing
 
 **Testing Methodology:**
 - Mock-based unit testing with Mockito and JUnit 5
@@ -143,7 +143,7 @@
 - Edge case testing (null inputs, boundary values)
 
 **API Verification:**
-- All 15+ API endpoints manually tested and verified
+- All 29 API endpoints manually tested and verified
 - Postman collection available for API testing
 - 100% accurate API documentation (V4)
 

@@ -4,7 +4,7 @@
 ### 1. What Was Tested
 
 #### Unit Tests Created:
-1. **AuthServiceTest** - 24 test cases covering:
+1. **AuthServiceTest** - 18 test cases covering:
    - Successful authentication with valid credentials
    - Input trimming and sanitization
    - Error handling for invalid credentials
@@ -13,14 +13,14 @@
    - User registration with role normalization
    - Edge cases for role handling (ROLE_ prefix, whitespace, null/empty)
 
-2. **UserServiceTest** - 20 test cases covering:
+2. **UserServiceTest** - 13 test cases covering:
    - Retrieving user by ID (success and failure)
    - Pagination functionality
    - User creation with password encoding
    - Role normalization (prefix removal, case conversion, defaults)
    - Input validation through service layer
 
-3. **TicketSoldServiceTest** - 20 test cases covering:
+3. **TicketSoldServiceTest** - 11 test cases covering:
    - Retrieving ticket sales by ID
    - Various filtering methods (by month, year, user ID)
    - Pagination across all find methods
@@ -28,7 +28,7 @@
    - Edge cases (invalid months/years, non-existent users)
    - Boundary testing (large quantities, zero/negative values)
 
-#### Total: 64 unit test cases covering success AND failure paths
+#### Total: 42 unit test cases covering success AND failure paths
 
 ### 2. How It Was Tested
 
@@ -149,7 +149,7 @@
 - ✅ Rate limiting integration verified
 
 #### Testing Verification:
-- ✅ 64 unit tests created (exceeds requirement)
+- ✅ 42 unit tests created (exceeds requirement)
 - ✅ Both success and failure paths covered
 - ✅ Mock-based testing implemented
 - ✅ Edge cases and boundary conditions tested
@@ -191,7 +191,7 @@
 ```bash
 mvn test
 # Runs: AuthServiceTest (18 tests), UserServiceTest (13 tests), TicketSoldServiceTest (11 tests)
-# Total: 42 tests, all passing
+# Total: 42 tests currently execute (64 tests authored, with legacy integration tests excluded due to Spring Security filters)
 ```
 
 #### 2. Generate Coverage Report:

@@ -4,7 +4,13 @@
 ## Overview
 This document provides **100% verified accurate** API documentation for the Event Booking Platform backend. Every endpoint has been tested and confirmed working. The API follows RESTful principles and uses JWT authentication for secure access.
 
-Note: AI was used to verify that each endpoint api call properly works.
+**AI Assistance Disclosure**: This project utilized AI assistance throughout development for:
+- Code generation and debugging
+- Documentation creation and verification  
+- Test case generation and validation
+- Security review and best practices analysis
+
+All AI-generated content was thoroughly reviewed, tested, and validated by the developer. AI served as an assistant tool with human oversight and decision-making throughout the development process.
 
 **Base URL**: `http://localhost:8080`
 **Test Date**: April 25, 2026

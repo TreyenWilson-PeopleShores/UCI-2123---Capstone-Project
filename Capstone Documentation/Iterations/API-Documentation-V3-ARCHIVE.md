@@ -844,7 +844,7 @@ Use admin credentials:
 ## Version History
 - **V1**: Initial API design
 - **V2**: Added JWT authentication and role-based access
-- **V3**: Current version with comprehensive endpoint documentation, pagination, filtering, and enhanced security
+- **V3**: Archived version - See V4 for current documentation
 
 ---
 

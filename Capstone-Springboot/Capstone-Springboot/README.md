@@ -34,7 +34,7 @@ The backend is protected against SQL injection through multiple layers:
 
 ## API Documentation
 
-**Complete API Documentation**: See `../../API-Documentation-V4.md` for 100% verified documentation of all 29 endpoints.
+**Complete API Documentation**: See `../Capstone Documentation/API-Documentation-V4.md` for 100% verified documentation of all 29 endpoints.
 
 ### Authentication
 - `POST /api/auth/login` - Login with username/password, returns JWT token
@@ -87,7 +87,7 @@ Detailed security information is available in the `/docs` directory:
 ## Running the Application
 
 ### Prerequisites
-- Java 17 or higher
+- Java 21 or higher (Maven target) - developed with Java 25 runtime
 - Maven 3.6+
 - MySQL 8.0+
 

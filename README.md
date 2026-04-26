@@ -26,7 +26,7 @@ UCI-2123---Capstone-Project/
 ```
 
 ## Prerequisites
-- **Java 25** (Used during development; earlier LTS versions may work but were not tested)
+- **Java 25** (Development runtime) with Maven target compatibility for Java 21 (as configured in pom.xml)
 
 
 - **Node.js 18+** and npm
