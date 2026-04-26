@@ -199,10 +199,10 @@ const UpcomingEvents = ({ maxEvents = 5, onEventClick, events: providedEvents })
             type="button"
             className="event-item"
             onClick={() => onEventClick && onEventClick(event)}
-            aria-label={(event.name || 'Upcoming event') + ' on ' + formatEventDate(event.date) + (event.venue ? ' at ' + getVenueName(event.venue) : '')}
+            aria-label={(event.title || event.name || event.event_name || 'Upcoming event') + ' on ' + formatEventDate(event.date) + (event.venue ? ' at ' + getVenueName(event.venue) : '')}
           >
             <div className="event-item-header">
-              <h3 className="event-name">{event.name}</h3>
+              <h3 className="event-name">{event.title || event.name || event.event_name}</h3>
               <span className="event-date">{formatEventDate(event.date)}</span>
             </div>
             <div className="event-details">
